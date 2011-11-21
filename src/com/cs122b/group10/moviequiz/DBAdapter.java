@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -26,7 +25,8 @@ public class DBAdapter extends SQLiteOpenHelper {
         this.sqlDB = getWritableDatabase();
     }
 
-    public void onCreate(SQLiteDatabase db) {
+    @Override
+	public void onCreate(SQLiteDatabase db) {
         // create tables
         db.execSQL("CREATE TABLE movies(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, year INTEGER NOT NULL, director TEXT NOT NULL);");
         db.execSQL("CREATE TABLE stars_in_movies(star_id INTEGER NOT NULL, movie_id INTEGER NOT NULL);");
@@ -52,7 +52,8 @@ public class DBAdapter extends SQLiteOpenHelper {
         }
     }
 
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    @Override
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         for (String table : TABLES) {
             db.execSQL("DROP TABLE IF EXISTS " + table);
         }
