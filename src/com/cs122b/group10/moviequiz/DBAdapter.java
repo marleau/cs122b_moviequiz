@@ -37,15 +37,27 @@ public class DBAdapter extends SQLiteOpenHelper {
             try {
                 BufferedReader in = new BufferedReader(new InputStreamReader(context.getAssets().open(ASSETS[i])));
                 String line;
+                System.out.println(TABLES[i]);
                 while((line = in.readLine()) != null) {
+                	String temp ="\t";
+                	
                     for (int j = 0; j < TABLE_COLS[i].length; j++) {
                         String[] in_vals = line.split(",");
                         ContentValues values = new ContentValues();
-                        values.put(TABLE_COLS[i][j], line);
+//                        if (i == 2 || (i == 1 && (j == 1 || j == 3)) || (i == 3 && j == 1)) {
+//                        	values.put(TABLE_COLS[i][j], Integer.getInteger(line));
+//                        } else {
+//                        	values.put(TABLE_COLS[i][j], line);
+//                        }
+                        values.put(TABLE_COLS[i][j], in_vals[j]);
                         db.insert(TABLES[i], null, values);
+                        
+                        temp += TABLE_COLS[i][j] + ": " + in_vals[j] + "\t ";
                     }
+                    
+                    System.out.println(temp);
                 }
-                in.close();
+//                in.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -9,5 +9,7 @@ public class MovieQuiz extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        
+        DBAdapter db = new DBAdapter(this);
     }
 }
