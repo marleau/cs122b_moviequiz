@@ -189,6 +189,18 @@ public class QuestionBuilder {
 			}
 		}
 	}
+	private void populateAnswersStars(String notThisFirstName, String notThisLastName) {
+		String getDirs = "SELECT DISTINCT first_name, last_name FROM stars ORDER BY RANDOM() LIMIT 5";
+		Cursor dirCur = db.executeQuery(getDirs);
+		for (int count = 0; count < 4;) {
+			dirCur.moveToNext();
+			String currentFN = dirCur.getString(0);
+			String currentLN = dirCur.getString(1);
+			if (!(currentFN.equals(notThisFirstName) && currentLN.equals(notThisLastName))) {
+				answers[count++] = cleanAnswer(currentFN) + " " + cleanAnswer(currentLN);// TODO remove quotes
+			}
+		}
+	}
     public void close(){
         db.close();
     }
