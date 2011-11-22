@@ -102,7 +102,7 @@ public class QuestionBuilder {
         correct = cleanAnswer(year);
         question = "When was\n" + title + "\nreleased?";
 
-        populateAnswersTitles(title);
+        populateAnswersYears(year);
     }
 
     // 3. Which star (was/was not) in the movie X?
@@ -185,6 +185,17 @@ public class QuestionBuilder {
 			dirCur.moveToNext();
 			String current = dirCur.getString(0);
 			if (!current.equals(notThisTitle)) {
+				answers[count++] = cleanAnswer(current);// TODO remove quotes
+			}
+		}
+	}
+	private void populateAnswersYears(String notThisYear) {
+		String query = "SELECT DISTINCT year FROM movies ORDER BY RANDOM() LIMIT 5";
+		Cursor qCur = db.executeQuery(query);
+		for (int count = 0; count < 4;) {
+			qCur.moveToNext();
+			String current = qCur.getString(0);
+			if (!current.equals(notThisYear)) {
 				answers[count++] = cleanAnswer(current);// TODO remove quotes
 			}
 		}
