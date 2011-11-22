@@ -6,27 +6,27 @@
     android:gravity="center" >
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/statsOfQuizzesButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:text="@string/statisticsOfQuizzes" />
 
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/tableRow1"
-        android:text="@string/hello" />
-
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/takeTheQuizButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:text="@string/takeTheQuiz" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="@string/hello" />
 
 </RelativeLayout>
