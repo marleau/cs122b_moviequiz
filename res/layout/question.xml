@@ -61,4 +61,13 @@
         android:text="@string/timerString"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
+    <TextView
+        android:id="@+id/scoreText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="@string/scoreString"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
 </RelativeLayout>

@@ -23,5 +23,6 @@
     <string name="numOfWrongValue">NI</string>
     <string name="goBack">Go Back</string>
     <string name="resetStats">Reset Statistics</string>
+    <string name="scoreString">0.0%</string>
 
 </resources>

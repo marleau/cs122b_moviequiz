@@ -1,9 +1,13 @@
 package com.cs122b.group10.moviequiz;
 
+import java.util.Random;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.*;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 public class Question extends Activity {
@@ -33,33 +37,67 @@ public class Question extends Activity {
 			}
 			else {
 				mHandler.removeCallbacks(this);
-				//TODO Game Over -- tally results and display
+				//Game Over -- tally results and display
+				updateScore();
+		        gameOverDialog = new AlertDialog.Builder(Question.this);
+		        gameOverDialog.setMessage("Game Over!\n\nScore: "+ score + "%")
+		               .setCancelable(false)
+		               .setPositiveButton("Finally!", new DialogInterface.OnClickListener() {
+		                   public void onClick(DialogInterface dialog, int id) {
+		                	   //TODO submit score
+		                        finish();
+		                   }
+		               });
 				AlertDialog alert = gameOverDialog.create();
 				alert.show();
-//				finish();
+			}
+		}
+
+		private void updateScore() {
+			score = 0;
+			if (numAnsCorr!=0 || numAnsWron!=0){
+				score = ((float)numAnsCorr/((float)numAnsCorr+(float)numAnsWron)) * 100;
 			}
 		}
 	};
 
 	private long pausedTime;
 	
+	//Game State
+	private int numAnsCorr;
+	private int numAnsWron;
+	private int correctAns;//1,2,3,4
+	
+	private float score = 0;
+
 	AlertDialog.Builder gameOverDialog;
+	AlertDialog.Builder ansCorrect;
+	AlertDialog.Builder ansWrong;
+
+
+    String ans1Str;
+    String ans2Str;
+    String ans3Str;
+    String ans4Str;
+    
+	Button answer1;
+	Button answer2;
+	Button answer3;
+	Button answer4;
 	
     @Override
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.question);
         
-        //end game dialog
-        //TODO DISPLAY SCORE
-        gameOverDialog = new AlertDialog.Builder(this);
-        gameOverDialog.setMessage("Game Over!")
-               .setCancelable(false)
-               .setPositiveButton("Finally!", new DialogInterface.OnClickListener() {
-                   public void onClick(DialogInterface dialog, int id) {
-                        finish();
-                   }
-               });
+        numAnsCorr=0;
+        numAnsWron=0;
+
+        //Get answer buttons
+        answer1 = (Button) findViewById(R.id.answer1);
+        answer2 = (Button) findViewById(R.id.answer2);
+        answer3 = (Button) findViewById(R.id.answer3);
+        answer4 = (Button) findViewById(R.id.answer4);
 
 
         //initalize timer
@@ -70,6 +108,11 @@ public class Question extends Activity {
         mHandler.post(quizTimer);
 
         
+        generateQuestion();
+        
+    }
+
+	private void generateQuestion() {
         //TODO create question
         /*	Who directed the movie X?
          *	When was the movie X released?
@@ -79,14 +122,174 @@ public class Question extends Activity {
          *	Which star appears in both movies X and Y?
          *	Which star did not appear in the same movie with the star X?
          *	Who directed the star X in year Y? */
+		Random rand = new Random();
+        
+        correctAns = rand.nextInt(4) + 1;//TODO TESTING, should be random 1-4
+        String correctString="Correct";//DEBUG
         
         
         //TODO load correct answer and random wrong answers
+
+        ans1Str = "WRONG";
+        ans2Str = "WRONG";
+        ans3Str = "WRONG";
+        ans4Str = "WRONG";
+
+        switch (correctAns) {
+		case 1:
+			ans1Str = correctString;
+			break;
+		case 2:
+			ans2Str = correctString;
+			break;
+		case 3:
+			ans3Str = correctString;
+			break;
+		case 4:
+			ans4Str = correctString;
+			break;
+		}
         
-        //TODO set success and failure conditions for buttons
+        displayQuestion();
+	}
+
+	private void displayQuestion() {
+		//Set Strings
+		answer1.setText(ans1Str);
+		answer2.setText(ans2Str);
+		answer3.setText(ans3Str);
+		answer4.setText(ans4Str);
         
+
+        updateDialogs();
+		
+		//All answers start as wrong
+        answer1.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+            	updateDialogs();
+				AlertDialog alert = ansWrong.create();
+				alert.show();
+            }
+        });
+        answer2.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+            	updateDialogs();
+				AlertDialog alert = ansWrong.create();
+				alert.show();
+            }
+        });
+        answer3.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+            	updateDialogs();
+				AlertDialog alert = ansWrong.create();
+				alert.show();
+            }
+        });
+        answer4.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+            	updateDialogs();
+				AlertDialog alert = ansWrong.create();
+				alert.show();
+            }
+        });
         
-    }
+        //Make correct answer 
+        switch (correctAns) {
+		case 1:
+	        answer1.setOnClickListener(new View.OnClickListener() {
+	            public void onClick(View view) {
+	            	updateDialogs();
+					AlertDialog alert = ansCorrect.create();
+					alert.show();
+	            }
+	        });
+			
+			break;
+		case 2:
+	        answer2.setOnClickListener(new View.OnClickListener() {
+	            public void onClick(View view) {
+	            	updateDialogs();
+					AlertDialog alert = ansCorrect.create();
+					alert.show();
+	            }
+	        });
+			
+			break;
+		case 3:
+	        answer3.setOnClickListener(new View.OnClickListener() {
+	            public void onClick(View view) {
+	            	updateDialogs();
+					AlertDialog alert = ansCorrect.create();
+					alert.show();
+	            }
+	        });
+			
+			break;
+		case 4:
+	        answer4.setOnClickListener(new View.OnClickListener() {
+	            public void onClick(View view) {
+	            	updateDialogs();
+					AlertDialog alert = ansCorrect.create();
+					alert.show();
+	            }
+	        });
+			
+			break;
+		}
+	}
+
+	private void updateDialogs() {
+		//Right and Wrong answer dialogs
+        ansCorrect = new AlertDialog.Builder(this);
+        ansCorrect.setMessage("CORRECT!")
+               .setCancelable(false)
+               .setPositiveButton("NEXT!", new DialogInterface.OnClickListener() {
+                   public void onClick(DialogInterface dialog, int id) {
+                	   numAnsCorr++;
+                	   updateScore();
+                	   generateQuestion();
+                       dialog.cancel();
+                   }
+               });
+        
+        String correctString="";
+        
+        switch (correctAns) {
+		case 1:
+			correctString = ans1Str;
+			break;
+		case 2:
+			correctString = ans2Str;
+			break;
+		case 3:
+			correctString = ans3Str;
+			break;
+		case 4:
+			correctString = ans4Str;
+			break;
+		}
+        
+        ansWrong = new AlertDialog.Builder(this);
+        ansWrong.setMessage("WRONG!\nCorrect answer was:\n"+correctString)
+               .setCancelable(false)
+               .setPositiveButton("NEXT!", new DialogInterface.OnClickListener() {
+                   public void onClick(DialogInterface dialog, int id) {
+                	   numAnsWron++;
+                	   updateScore();
+                	   generateQuestion();
+                       dialog.cancel();
+                   }
+               });
+	}
+
+	private void updateScore() {
+		TextView scoreText = (TextView) findViewById(R.id.scoreText);
+		score = 0;
+		if (numAnsCorr!=0 || numAnsWron!=0){
+			score = ((float)numAnsCorr/((float)numAnsCorr+(float)numAnsWron)) * 100.0f;
+		}
+		scoreText.setText(score+"%");
+	}
     
     public void onBackPressed() {
     	//Alert user that they are leaving the quiz
@@ -95,6 +298,7 @@ public class Question extends Activity {
                .setCancelable(false)
                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
+                	   //TODO submit stats
                         finish();
                    }
                })
