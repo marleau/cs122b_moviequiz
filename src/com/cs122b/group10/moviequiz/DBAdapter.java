@@ -18,7 +18,7 @@ public class DBAdapter extends SQLiteOpenHelper {
 	private static final String DB_NAME = "MovieQuizDB";
     private static final int DB_VERSION = 1;
     private static final String[] ASSETS = {"movies.csv", "stars.csv", "stars_in_movies.csv"};
-    private static final String[] TABLES = {"movies", "stars", "stars_in_movies"};
+    private static final String[] TABLES = {"movies", "stars", "stars_in_movies", "statistics"};
     private static final String[][] TABLE_COLS = {{"id", "title", "year", "director"}, {"id", "first_name", "last_name"}, {"star_id", "movie_id"}};
     private SQLiteDatabase sqlDB;
     private Context context;
@@ -40,11 +40,7 @@ public class DBAdapter extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE movies(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, year INTEGER NOT NULL, director TEXT NOT NULL);");
         db.execSQL("CREATE TABLE stars_in_movies(star_id INTEGER NOT NULL, movie_id INTEGER NOT NULL);");
         db.execSQL("CREATE TABLE stars(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, first_name TEXT, last_name TEXT);");
-        //TODO create table statistics
-        //game number: int; auto inc
-        //correct: int
-        //wrong: int
-        //duration: long (milliseconds)
+        db.execSQL("CREATE TABLE statistics(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, correct_cnt INTEGER, wrong_cnt INTEGER, duration LONG);");
 
         // populate tables
         for (int table = 0; table < 3; table++) {

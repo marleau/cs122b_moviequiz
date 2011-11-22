@@ -24,7 +24,7 @@ public class QuestionBuilder {
         this.db = db;
         answers = new String[4];
     }
-    
+
     public void nextQuestion() {
         answers = new String[4];
         correct = "";
@@ -32,7 +32,7 @@ public class QuestionBuilder {
         //buildQuestion(1 + (int)(Math.random() * (8)));
 
         // for test
-//        buildQuestion(1 + (int)(Math.random() * (2)));
+        //        buildQuestion(1 + (int)(Math.random() * (2)));
         buildQuestion(2);
     }
 
@@ -43,7 +43,7 @@ public class QuestionBuilder {
     public String getCorrectAnswer() {
         return correct;
     }
-    
+
     public String[] getAnswers() {
         return answers;
     }
@@ -51,32 +51,32 @@ public class QuestionBuilder {
     private void buildQuestion(int i) {
         switch (i) {
             case 1:
-                 buildWhoDirectedMovie();
+                buildWhoDirectedMovie();
             case 2:
-                 buildWhenMovieReleased();
+                buildWhenMovieReleased();
             case 3:
-                 buildStarInOrNotOneMovie();
+                buildStarInOrNotOneMovie();
             case 4:
-                 buildMovieWithTwoStars();
+                buildMovieWithTwoStars();
             case 5:
-                 buildWhoDirectedOrNotStar();
+                buildWhoDirectedOrNotStar();
             case 6:
-                 buildWhichStarInBothMovies();
+                buildWhichStarInBothMovies();
             case 7:
-                 buildWhichStarNotInSameMovieWithStar();
+                buildWhichStarNotInSameMovieWithStar();
             case 8:
-                 buildWhoDirectedStarInYear();
+                buildWhoDirectedStarInYear();
             default:
-            	 buildWhoDirectedMovie();
+                buildWhoDirectedMovie();
         }
     }
 
-// 1. Who directed the movie X?
+    // 1. Who directed the movie X?
     private void buildWhoDirectedMovie() {
         query = "SELECT title, director FROM movies ORDER BY RANDOM() LIMIT 10";
         cursor = db.executeQuery(query);
         cursor.moveToFirst();
-        
+
         String director = cursor.getString(1);
         String movie = cursor.getString(0);
         correct = cleanAnswer(director);
@@ -84,14 +84,14 @@ public class QuestionBuilder {
 
         int count = 0;
         while (count < 4) {
-        	moveCursor();
+            moveCursor();
             String current = cursor.getString(1);
             if (addAnswer(current, count))
                 count++;
         }
     }
 
-// 2. When was the movie X released?
+    // 2. When was the movie X released?
     private void buildWhenMovieReleased() {
         query = "SELECT title, year FROM movies ORDER BY RANDOM() LIMIT 10";
         cursor = db.executeQuery(query);
@@ -104,39 +104,39 @@ public class QuestionBuilder {
 
         int count = 0;
         while (count < 4) {
-        	moveCursor();
+            moveCursor();
             String current = cursor.getString(1);
             if (addAnswer(current, count)) 
                 count++;
         }
     }
 
-// 3. Which star (was/was not) in the movie X?
+    // 3. Which star (was/was not) in the movie X?
     private void buildStarInOrNotOneMovie() {
         question = "";
     }
 
-// 4. In which movie the stars X and Y appear together?
+    // 4. In which movie the stars X and Y appear together?
     private void buildMovieWithTwoStars() {
         question = "";
     }
 
-// 5. Who directed/did not direct the star X?
+    // 5. Who directed/did not direct the star X?
     private void buildWhoDirectedOrNotStar() {
         question = "";
     }
 
-// 6. Which star appears in both movies X and Y?
+    // 6. Which star appears in both movies X and Y?
     private void buildWhichStarInBothMovies() {
         question = "";
     }
 
-// 7. Which star did not appear in the same movie with the star X?
+    // 7. Which star did not appear in the same movie with the star X?
     private void buildWhichStarNotInSameMovieWithStar() {
         question = "";
     }
 
-// 8. Who directed the star X in year Y?
+    // 8. Who directed the star X in year Y?
     private void buildWhoDirectedStarInYear() {
         question = "";
     }
@@ -155,7 +155,7 @@ public class QuestionBuilder {
 
         if (add)
             answers[count] = str;
-        
+
         return add;
     }
 
@@ -163,7 +163,7 @@ public class QuestionBuilder {
     private String cleanAnswer(String str) {
         return str.substring(1, str.length()-1);
     }
-    
+
     // prevent cursor out of bounds exception
     private void moveCursor() {
         if (cursor.getPosition() < cursor.getCount()) {
@@ -172,5 +172,9 @@ public class QuestionBuilder {
             cursor = db.executeQuery(query);
             cursor.moveToFirst();
         }
+    }
+
+    public void close(){
+        db.close();
     }
 }
