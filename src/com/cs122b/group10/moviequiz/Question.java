@@ -64,6 +64,7 @@ public class Question extends Activity {
 	private long pausedTime;
 	
 	//Game State
+	private String currentQuestion;
 	private int numAnsCorr;
 	private int numAnsWron;
 	private int correctAns;//1,2,3,4
@@ -74,6 +75,7 @@ public class Question extends Activity {
 	AlertDialog.Builder ansCorrect;
 	AlertDialog.Builder ansWrong;
 
+	TextView currentQuestionText;
 
     String ans1Str;
     String ans2Str;
@@ -98,7 +100,7 @@ public class Question extends Activity {
         answer2 = (Button) findViewById(R.id.answer2);
         answer3 = (Button) findViewById(R.id.answer3);
         answer4 = (Button) findViewById(R.id.answer4);
-
+        currentQuestionText = (TextView) findViewById(R.id.questionText);
 
         //initalize timer
         timerText = (TextView)this.findViewById(R.id.timerText);
@@ -124,6 +126,8 @@ public class Question extends Activity {
          *	Who directed the star X in year Y? */
 		Random rand = new Random();
         
+		currentQuestion = "Question " + rand.nextInt() + "?";//DEBUG
+		
         correctAns = rand.nextInt(4) + 1;//TODO TESTING, should be random 1-4
         String correctString="Correct";//DEBUG
         
@@ -154,11 +158,14 @@ public class Question extends Activity {
 	}
 
 	private void displayQuestion() {
-		//Set Strings
+		//Set Answers
 		answer1.setText(ans1Str);
 		answer2.setText(ans2Str);
 		answer3.setText(ans3Str);
 		answer4.setText(ans4Str);
+		
+		//SetQuestion
+        currentQuestionText.setText(currentQuestion);
         
 
         updateDialogs();
@@ -166,28 +173,24 @@ public class Question extends Activity {
 		//All answers start as wrong
         answer1.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-            	updateDialogs();
 				AlertDialog alert = ansWrong.create();
 				alert.show();
             }
         });
         answer2.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-            	updateDialogs();
 				AlertDialog alert = ansWrong.create();
 				alert.show();
             }
         });
         answer3.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-            	updateDialogs();
 				AlertDialog alert = ansWrong.create();
 				alert.show();
             }
         });
         answer4.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-            	updateDialogs();
 				AlertDialog alert = ansWrong.create();
 				alert.show();
             }
@@ -198,7 +201,6 @@ public class Question extends Activity {
 		case 1:
 	        answer1.setOnClickListener(new View.OnClickListener() {
 	            public void onClick(View view) {
-	            	updateDialogs();
 					AlertDialog alert = ansCorrect.create();
 					alert.show();
 	            }
@@ -208,7 +210,6 @@ public class Question extends Activity {
 		case 2:
 	        answer2.setOnClickListener(new View.OnClickListener() {
 	            public void onClick(View view) {
-	            	updateDialogs();
 					AlertDialog alert = ansCorrect.create();
 					alert.show();
 	            }
@@ -218,7 +219,6 @@ public class Question extends Activity {
 		case 3:
 	        answer3.setOnClickListener(new View.OnClickListener() {
 	            public void onClick(View view) {
-	            	updateDialogs();
 					AlertDialog alert = ansCorrect.create();
 					alert.show();
 	            }
@@ -228,7 +228,6 @@ public class Question extends Activity {
 		case 4:
 	        answer4.setOnClickListener(new View.OnClickListener() {
 	            public void onClick(View view) {
-	            	updateDialogs();
 					AlertDialog alert = ansCorrect.create();
 					alert.show();
 	            }
@@ -236,6 +235,7 @@ public class Question extends Activity {
 			
 			break;
 		}
+        updateScore();
 	}
 
 	private void updateDialogs() {
@@ -288,7 +288,7 @@ public class Question extends Activity {
 		if (numAnsCorr!=0 || numAnsWron!=0){
 			score = ((float)numAnsCorr/((float)numAnsCorr+(float)numAnsWron)) * 100.0f;
 		}
-		scoreText.setText(score+"%");
+		scoreText.setText(String.valueOf(score).substring(0, 4)+"%");
 	}
     
     public void onBackPressed() {
@@ -342,7 +342,15 @@ public class Question extends Activity {
          *  screen orientation changes. (You can simulate rotation on your emulator by pressing Ctrl-F11.) When the 
          *  screen orientation changes, the system destroys and recreates the activity in order to apply alternative 
          *  resources that might be available for the new orientation.*/ 
-        //TODO save all values
+        // save all values
+    	outState.putString("currentQuestion", currentQuestion);
+    	outState.putString("ans1Str", ans1Str);
+    	outState.putString("ans2Str", ans2Str);
+    	outState.putString("ans3Str", ans3Str);
+    	outState.putString("ans4Str", ans4Str);
+    	outState.putInt("correctAns", correctAns);
+    	outState.putInt("numAnsCorr", numAnsCorr);
+    	outState.putInt("numAnsWron", numAnsWron);
 
     	//save timer
         outState.putLong("mStartTime", mStartTime);
@@ -357,6 +365,19 @@ public class Question extends Activity {
     protected void onRestoreInstanceState(Bundle inState) {
     	//TODO load all values and adjust clock like on resume
     	
+    	//load game state
+    	currentQuestion = inState.getString("currentQuestion");
+    	ans1Str = inState.getString("ans1Str");
+    	ans2Str = inState.getString("ans2Str");
+    	ans3Str = inState.getString("ans3Str");
+    	ans4Str = inState.getString("ans4Str");
+
+    	correctAns = inState.getInt("correctAns");
+    	numAnsCorr = inState.getInt("numAnsCorr");
+    	numAnsWron = inState.getInt("numAnsWron");
+    	
+    	
+    	displayQuestion();
     	
     	//load timer
     	mStartTime = inState.getLong("mStartTime");
