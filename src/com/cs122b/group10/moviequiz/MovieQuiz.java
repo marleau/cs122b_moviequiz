@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.Button;
 
 public class MovieQuiz extends Activity {
-    
+	DBAdapter db;
     /** Called when the activity is first created. */
     @Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -38,9 +38,17 @@ public class MovieQuiz extends Activity {
         });
 
         
-        //FIXME Errors setting up inital DB
-//        DBAdapter db = new DBAdapter(this);
+        //Setting up inital DB
+        db = new DBAdapter(this);
     }
+
+	@Override
+	protected void onDestroy() {
+		// TODO Close DB
+		db.close();
+		super.onDestroy();
+	}
+    
     
     
 }

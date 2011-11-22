@@ -34,16 +34,16 @@ public class Question extends Activity {
 			else {
 				mHandler.removeCallbacks(this);
 				//TODO Game Over -- tally results and display
-				AlertDialog alert = builder.create();
+				AlertDialog alert = gameOverDialog.create();
 				alert.show();
-				finish();
+//				finish();
 			}
 		}
 	};
 
 	private long pausedTime;
 	
-	AlertDialog.Builder builder;
+	AlertDialog.Builder gameOverDialog;
 	
     @Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -51,8 +51,9 @@ public class Question extends Activity {
         setContentView(R.layout.question);
         
         //end game dialog
-        builder = new AlertDialog.Builder(this);
-        builder.setMessage("Game Over!")
+        //TODO DISPLAY SCORE
+        gameOverDialog = new AlertDialog.Builder(this);
+        gameOverDialog.setMessage("Game Over!")
                .setCancelable(false)
                .setPositiveButton("Finally!", new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int id) {
