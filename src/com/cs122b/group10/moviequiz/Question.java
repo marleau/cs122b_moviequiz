@@ -13,9 +13,9 @@ import android.widget.Button;
 import android.widget.TextView;
 
 public class Question extends Activity {
-	private static final long duration = 180000;// 3 minutes
-
-	// Setup Timer
+	private static final long duration = 180000;//3 minutes
+	
+	//Setup Timer
 	private TextView timerText;
 	private Handler mHandler = new Handler();
 	private long mStartTime;
@@ -47,6 +47,8 @@ public class Question extends Activity {
 
 	private long pausedTime;
 
+	private QuestionBuilder qb;
+	
 	// Game State
 	private String currentQuestion;
 	private int numAnsCorr;
@@ -95,8 +97,17 @@ public class Question extends Activity {
 		mStartTime = SystemClock.uptimeMillis();
 		mHandler.post(quizTimer);
 
-		generateQuestion();
 
+		qb = new QuestionBuilder(new DBAdapter(this));
+		
+        generateQuestion();
+        
+    }
+
+	@Override
+	protected void onDestroy() {
+		qb.close();
+		super.onDestroy();
 	}
 
 	private void generateQuestion() {
@@ -112,18 +123,25 @@ public class Question extends Activity {
 		 * Who directed the star X in year Y?
 		 */
 		Random rand = new Random();
-
-		currentQuestion = "Question #"+String.valueOf(numAnsCorr+numAnsWron+1)+"\n" + rand.nextInt() + "?";// DEBUG
-
-		correctAns = rand.nextInt(4) + 1;// TODO TESTING, should be random 1-4
-		String correctString = "Correct";// DEBUG
-
-		// TODO load correct answer and random wrong answers
-
-		ans1Str = "WRONG";
-		ans2Str = "WRONG";
-		ans3Str = "WRONG";
-		ans4Str = "WRONG";
+		
+		// generate correct answer and random wrong answers
+		
+		qb.nextQuestion();
+        		
+		currentQuestion = "Question #"+String.valueOf(numAnsCorr+numAnsWron+1)+"\n"+qb.getQuestion();
+		
+        correctAns = rand.nextInt(4) + 1;//should be random 1-4
+        
+        // save correct answer and random wrong answers
+        String correctString = qb.getCorrectAnswer();
+        String[] answers = qb.getAnswers();
+        for (String ans : answers) {
+        	System.out.println(ans);//DEBUG
+        }
+        ans1Str = answers[0];
+        ans2Str = answers[1];
+        ans3Str = answers[2];
+        ans4Str = answers[3];
 
 		switch (correctAns) {
 		case 1:
