@@ -25,6 +25,17 @@ public class MovieQuiz extends Activity {
             }
 
         });
+        
+        Button stats = (Button) findViewById(R.id.statsOfQuizzesButton);
+        
+        stats.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View view) {
+    			Intent intent = new Intent(MovieQuiz.this, Statistics.class);
+    			startActivity(intent);
+            }
+
+        });
 
         
         //FIXME Errors setting up inital DB
