@@ -30,10 +30,20 @@ public class DBAdapter extends SQLiteOpenHelper {
 
     @Override
 	public void onCreate(SQLiteDatabase db) {
+
+        for (String table : TABLES) {
+            db.execSQL("DROP TABLE IF EXISTS " + table);
+        }
+        
         // create tables
         db.execSQL("CREATE TABLE movies(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, year INTEGER NOT NULL, director TEXT NOT NULL);");
         db.execSQL("CREATE TABLE stars_in_movies(star_id INTEGER NOT NULL, movie_id INTEGER NOT NULL);");
         db.execSQL("CREATE TABLE stars(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, first_name TEXT, last_name TEXT);");
+        //TODO create table statistics
+        //game number: int; auto inc
+        //correct: int
+        //wrong: int
+        //duration: long (milliseconds)
 
         // populate tables
         for (int table = 0; table < 3; table++) {
@@ -42,7 +52,7 @@ public class DBAdapter extends SQLiteOpenHelper {
                 String line;
                 System.out.println(TABLES[table]);
                 while((line = in.readLine()) != null) {
-                	String temp ="\t";
+//                	String temp ="\t";//DEBUG
 
                     ContentValues values = new ContentValues();
                     
@@ -61,18 +71,16 @@ public class DBAdapter extends SQLiteOpenHelper {
                     db.insert(TABLES[table], null, values);
 //                    System.out.println(temp);//DEBUG
                 }
-//                in.close();
+                in.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    @Override
+	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        for (String table : TABLES) {
-            db.execSQL("DROP TABLE IF EXISTS " + table);
-        }
-        onCreate(db);
-    }
+		//Schema wont change
+		onCreate(db);
+	}
 }

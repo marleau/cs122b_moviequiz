@@ -65,12 +65,12 @@ public class Question extends Activity {
         //initalize timer
         timerText = (TextView)this.findViewById(R.id.timerText);
         pausedTime = 0;
-        //Uptime and not current time.... weird; used for: mHandler.postAtTime(this, now + 1000);
+        //NOTE Uptime and not current time! used for 'now' in :: mHandler.postAtTime(this, now + 1000);
         mStartTime = SystemClock.uptimeMillis();
         mHandler.post(quizTimer);
 
         
-        //create question
+        //TODO create question
         /*	Who directed the movie X?
          *	When was the movie X released?
          *	Which star (was/was not) in the movie X?
@@ -81,9 +81,9 @@ public class Question extends Activity {
          *	Who directed the star X in year Y? */
         
         
-        //load correct answer and random wrong answers
+        //TODO load correct answer and random wrong answers
         
-        //set success and failure conditions for buttons
+        //TODO set success and failure conditions for buttons
         
         
     }
@@ -112,7 +112,7 @@ public class Question extends Activity {
     protected void onPause() {
         super.onPause();
         //When the application is paused, the timer should also be paused and it shouldn't count down.
-        //TODO stop timer
+        //stop timer
 
 		mHandler.removeCallbacks(quizTimer);
 		pausedTime = SystemClock.uptimeMillis();
@@ -121,7 +121,7 @@ public class Question extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        //TODO start timer
+        //start timer
         if (pausedTime != 0){
         	mStartTime += SystemClock.uptimeMillis() - pausedTime;
         }
@@ -140,6 +140,7 @@ public class Question extends Activity {
          *  resources that might be available for the new orientation.*/ 
         //TODO save all values
 
+    	//save timer
         outState.putLong("mStartTime", mStartTime);
         outState.putLong("pausedTime", SystemClock.uptimeMillis());
         
@@ -153,6 +154,7 @@ public class Question extends Activity {
     	//TODO load all values and adjust clock like on resume
     	
     	
+    	//load timer
     	mStartTime = inState.getLong("mStartTime");
         if (pausedTime != 0){
         	mStartTime += SystemClock.uptimeMillis() - inState.getLong("pausedTime");

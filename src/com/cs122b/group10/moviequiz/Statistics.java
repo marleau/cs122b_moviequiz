@@ -28,19 +28,16 @@ public class Statistics extends Activity {
 		
 		//TODO load stats .... from database?
 
+		//Back to main menu button
 		Button goBack = (Button) findViewById(R.id.goBackButton);
-
 		goBack.setOnClickListener(new View.OnClickListener() {
-
 			public void onClick(View view) {
 				finish();
 			}
-
 		});
-
-		Button resetStats = (Button) findViewById(R.id.resetStatsButton);
-
+		
 		// build reset stats dialog
+		Button resetStats = (Button) findViewById(R.id.resetStatsButton);
 		builder = new AlertDialog.Builder(this);
 		builder.setMessage("Are you sure you want to reset statistics?").setCancelable(false).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
@@ -60,13 +57,11 @@ public class Statistics extends Activity {
 		});
 
 		resetStats.setOnClickListener(new View.OnClickListener() {
-
 			public void onClick(View view) {
 				// ask for confirmation and reset stats
 				AlertDialog alert = builder.create();
 				alert.show();
 			}
-
 		});
 	}
 }
