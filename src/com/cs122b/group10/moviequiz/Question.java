@@ -111,7 +111,7 @@ public class Question extends Activity {
 	}
 
 	private void generateQuestion() {
-		// TODO create question
+		// create question
 		/*
 		 * Who directed the movie X? 
 		 * When was the movie X released? Which star

@@ -57,22 +57,31 @@ public class QuestionBuilder {
         switch (i) {
             case 1:
                 buildWhoDirectedMovie();
+                break;
             case 2:
                 buildWhenMovieReleased();
+                break;
             case 3:
                 buildStarInOrNotOneMovie();
+                break;
             case 4:
                 buildMovieWithTwoStars();
+                break;
             case 5:
                 buildWhoDirectedOrNotStar();
+                break;
             case 6:
                 buildWhichStarInBothMovies();
+                break;
             case 7:
                 buildWhichStarNotInSameMovieWithStar();
+                break;
             case 8:
                 buildWhoDirectedStarInYear();
+                break;
             default:
                 buildWhoDirectedMovie();
+                break;
         }
     }
 
@@ -168,22 +177,22 @@ public class QuestionBuilder {
 //        }
 //    }
 	private void populateAnswersDirectors(String notThisDirector) {
-		String getDirs = "SELECT DISTINCT director FROM movies ORDER BY RANDOM() LIMIT 5";
-		Cursor dirCur = db.executeQuery(getDirs);
+		String query = "SELECT DISTINCT director FROM movies ORDER BY RANDOM() LIMIT 5";
+		Cursor qCur = db.executeQuery(query);
 		for (int count = 0; count < 4;) {
-			dirCur.moveToNext();
-			String current = dirCur.getString(0);
+			qCur.moveToNext();
+			String current = qCur.getString(0);
 			if (!current.equals(notThisDirector)) {
 				answers[count++] = cleanAnswer(current);// TODO remove quotes
 			}
 		}
 	}
 	private void populateAnswersTitles(String notThisTitle) {
-		String getDirs = "SELECT DISTINCT title FROM movies ORDER BY RANDOM() LIMIT 5";
-		Cursor dirCur = db.executeQuery(getDirs);
+		String query = "SELECT DISTINCT title FROM movies ORDER BY RANDOM() LIMIT 5";
+		Cursor qCur = db.executeQuery(query);
 		for (int count = 0; count < 4;) {
-			dirCur.moveToNext();
-			String current = dirCur.getString(0);
+			qCur.moveToNext();
+			String current = qCur.getString(0);
 			if (!current.equals(notThisTitle)) {
 				answers[count++] = cleanAnswer(current);// TODO remove quotes
 			}
@@ -201,12 +210,12 @@ public class QuestionBuilder {
 		}
 	}
 	private void populateAnswersStars(String notThisFirstName, String notThisLastName) {
-		String getDirs = "SELECT DISTINCT first_name, last_name FROM stars ORDER BY RANDOM() LIMIT 5";
-		Cursor dirCur = db.executeQuery(getDirs);
+		String query = "SELECT DISTINCT first_name, last_name FROM stars ORDER BY RANDOM() LIMIT 5";
+		Cursor qCur = db.executeQuery(query);
 		for (int count = 0; count < 4;) {
-			dirCur.moveToNext();
-			String currentFN = dirCur.getString(0);
-			String currentLN = dirCur.getString(1);
+			qCur.moveToNext();
+			String currentFN = qCur.getString(0);
+			String currentLN = qCur.getString(1);
 			if (!(currentFN.equals(notThisFirstName) && currentLN.equals(notThisLastName))) {
 				answers[count++] = cleanAnswer(currentFN) + " " + cleanAnswer(currentLN);// TODO remove quotes
 			}
