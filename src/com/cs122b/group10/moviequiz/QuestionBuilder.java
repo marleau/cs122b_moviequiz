@@ -17,6 +17,8 @@ public class QuestionBuilder {
     private String[] answers;
     private String correct;
     private String question;
+    private String query;
+    private Cursor cursor;
 
     public QuestionBuilder(DBAdapter db) {
         this.db = db;
@@ -24,10 +26,14 @@ public class QuestionBuilder {
     }
     
     public void nextQuestion() {
+        answers = new String[4];
+        correct = "";
+        question = "";
         //buildQuestion(1 + (int)(Math.random() * (8)));
 
         // for test
-        buildQuestion(1);
+//        buildQuestion(1 + (int)(Math.random() * (2)));
+        buildQuestion(2);
     }
 
     public String getQuestion() {
@@ -67,29 +73,42 @@ public class QuestionBuilder {
 
 // 1. Who directed the movie X?
     private void buildWhoDirectedMovie() {
-        String query = "SELECT title, director FROM movies ORDER BY RANDOM() LIMIT 10";
-        Cursor cur = db.executeQuery(query);
-        cur.moveToFirst();
-        String director = cur.getString(1);
-        String movie = cur.getString(0);
-        correct = director.substring(1, director.length()-1);
-        int count = 0;
-
-        while (count < 4) {
-            cur.moveToNext();
-            String currentD = cur.getString(1);
-//            if (!currentD.equals(director)) {
-                answers[count] = currentD;
-                count++;
-//            }
-        }
-
+        query = "SELECT title, director FROM movies ORDER BY RANDOM() LIMIT 10";
+        cursor = db.executeQuery(query);
+        cursor.moveToFirst();
+        
+        String director = cursor.getString(1);
+        String movie = cursor.getString(0);
+        correct = cleanAnswer(director);
         question = "Who directed the movie\n" + movie + "?";
+
+        int count = 0;
+        while (count < 4) {
+        	moveCursor();
+            String current = cursor.getString(1);
+            if (addAnswer(current, count))
+                count++;
+        }
     }
 
 // 2. When was the movie X released?
     private void buildWhenMovieReleased() {
-        question = "";
+        query = "SELECT title, year FROM movies ORDER BY RANDOM() LIMIT 10";
+        cursor = db.executeQuery(query);
+
+        cursor.moveToFirst();
+        String title = cursor.getString(0);
+        String year = cursor.getString(1);
+        correct = cleanAnswer(year);
+        question = "When was\n" + title + "\nreleased?";
+
+        int count = 0;
+        while (count < 4) {
+        	moveCursor();
+            String current = cursor.getString(1);
+            if (addAnswer(current, count)) 
+                count++;
+        }
     }
 
 // 3. Which star (was/was not) in the movie X?
@@ -122,4 +141,36 @@ public class QuestionBuilder {
         question = "";
     }
 
+    // check potential answer against correct answer and exsiting answers
+    private boolean addAnswer(String str, int count) {
+        boolean add = true;
+        str = cleanAnswer(str);
+
+        if (!str.equals(correct)) {
+            for (String ans : answers) {
+                if (str.equals(ans))
+                    add = false;
+            }
+        }
+
+        if (add)
+            answers[count] = str;
+        
+        return add;
+    }
+
+    // remove surrounding quotes
+    private String cleanAnswer(String str) {
+        return str.substring(1, str.length()-1);
+    }
+    
+    // prevent cursor out of bounds exception
+    private void moveCursor() {
+        if (cursor.getPosition() < cursor.getCount()) {
+            cursor.moveToNext();
+        } else {
+            cursor = db.executeQuery(query);
+            cursor.moveToFirst();
+        }
+    }
 }
