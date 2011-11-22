@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="hello">Hello World, MovieQuizActivity!</string>
+    <string name="hello">Welcome to MovieQuiz\nSelect an option:\n</string>
     <string name="app_name">MovieQuiz</string>
+    <string name="takeTheQuiz">Take the Quiz!</string>
+    <string name="statisticsOfQuizzes">Statistics of Quizzes</string>
 
 </resources>
