@@ -284,11 +284,12 @@ public class Question extends Activity {
 
 	private void updateScore() {
 		TextView scoreText = (TextView) findViewById(R.id.scoreText);
-		score = 0;
+		score = 0.0f;
 		if (numAnsCorr!=0 || numAnsWron!=0){
 			score = ((float)numAnsCorr/((float)numAnsCorr+(float)numAnsWron)) * 100.0f;
 		}
-		scoreText.setText(String.valueOf(score).substring(0, 4)+"%");
+		String scoreString = String.valueOf(score);
+		scoreText.setText(scoreString.substring(0, Math.min(4, scoreString.length()))+"%");
 	}
     
     public void onBackPressed() {
@@ -365,6 +366,7 @@ public class Question extends Activity {
     protected void onRestoreInstanceState(Bundle inState) {
     	//TODO load all values and adjust clock like on resume
     	
+
     	//load game state
     	currentQuestion = inState.getString("currentQuestion");
     	ans1Str = inState.getString("ans1Str");
@@ -375,16 +377,16 @@ public class Question extends Activity {
     	correctAns = inState.getInt("correctAns");
     	numAnsCorr = inState.getInt("numAnsCorr");
     	numAnsWron = inState.getInt("numAnsWron");
-    	
-    	
+
     	displayQuestion();
+    	
     	
     	//load timer
     	mStartTime = inState.getLong("mStartTime");
         if (pausedTime != 0){
         	mStartTime += SystemClock.uptimeMillis() - inState.getLong("pausedTime");
+            mHandler.post(quizTimer);
         }
-        mHandler.post(quizTimer);
         
         super.onRestoreInstanceState(inState);
     }
