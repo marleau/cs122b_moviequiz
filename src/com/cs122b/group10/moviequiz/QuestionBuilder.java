@@ -15,7 +15,7 @@ import android.database.Cursor;
 
 public class QuestionBuilder {
 
-    private static final int NUMBER_OF_TYPES = 2;
+    private static final int NUMBER_OF_TYPES = 2;//TODO Should be 8
 	private DBAdapter db;
     private String[] answers;
     private String correct;
@@ -108,7 +108,7 @@ public class QuestionBuilder {
         cursor.moveToFirst();
         String title = cursor.getString(0);
         String year = cursor.getString(1);
-        correct = cleanAnswer(year);
+        correct = year;
         question = "When was\n" + title + "\nreleased?";
 
         populateAnswersYears(year);
@@ -183,7 +183,7 @@ public class QuestionBuilder {
 			qCur.moveToNext();
 			String current = qCur.getString(0);
 			if (!current.equals(notThisDirector)) {
-				answers[count++] = cleanAnswer(current);// TODO remove quotes
+				answers[count++] = cleanAnswer(current);
 			}
 		}
 	}
@@ -194,7 +194,7 @@ public class QuestionBuilder {
 			qCur.moveToNext();
 			String current = qCur.getString(0);
 			if (!current.equals(notThisTitle)) {
-				answers[count++] = cleanAnswer(current);// TODO remove quotes
+				answers[count++] = cleanAnswer(current);
 			}
 		}
 	}
@@ -205,7 +205,7 @@ public class QuestionBuilder {
 			qCur.moveToNext();
 			String current = qCur.getString(0);
 			if (!current.equals(notThisYear)) {
-				answers[count++] = cleanAnswer(current);// TODO remove quotes
+				answers[count++] = current;
 			}
 		}
 	}
@@ -217,7 +217,7 @@ public class QuestionBuilder {
 			String currentFN = qCur.getString(0);
 			String currentLN = qCur.getString(1);
 			if (!(currentFN.equals(notThisFirstName) && currentLN.equals(notThisLastName))) {
-				answers[count++] = cleanAnswer(currentFN) + " " + cleanAnswer(currentLN);// TODO remove quotes
+				answers[count++] = cleanAnswer(currentFN) + " " + cleanAnswer(currentLN);
 			}
 		}
 	}
