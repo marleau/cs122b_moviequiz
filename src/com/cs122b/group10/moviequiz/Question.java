@@ -13,6 +13,9 @@ import android.widget.TextView;
 public class Question extends Activity {
 	private static final long duration = 180000;//3 minutes
 	
+	private QuestionBuilder qb;
+	private DBAdapter db;
+	
 	//Setup Timer
 	private TextView timerText;
 	private Handler mHandler = new Handler();
@@ -109,7 +112,8 @@ public class Question extends Activity {
         mStartTime = SystemClock.uptimeMillis();
         mHandler.post(quizTimer);
 
-        
+        db = new DBAdapter(this);
+		qb = new QuestionBuilder(db);
         generateQuestion();
         
     }
@@ -125,19 +129,32 @@ public class Question extends Activity {
          *	Which star did not appear in the same movie with the star X?
          *	Who directed the star X in year Y? */
 		Random rand = new Random();
+		
+		qb.nextQuestion();
         
 		currentQuestion = "Question " + rand.nextInt() + "?";//DEBUG
 		
+		currentQuestion = qb.getQuestion();
+		
         correctAns = rand.nextInt(4) + 1;//TODO TESTING, should be random 1-4
-        String correctString="Correct";//DEBUG
+//        String correctString="Correct";//DEBUG
         
         
         //TODO load correct answer and random wrong answers
+        String correctString = qb.getCorrectAnswer();
+        String[] answers = qb.getAnswers();
+        for (String ans : answers) {
+        	System.out.println(ans);
+        }
+        ans1Str = answers[0];
+        ans2Str = answers[1];
+        ans3Str = answers[2];
+        ans4Str = answers[3];
 
-        ans1Str = "WRONG";
-        ans2Str = "WRONG";
-        ans3Str = "WRONG";
-        ans4Str = "WRONG";
+//        ans1Str = "WRONG";
+//        ans2Str = "WRONG";
+//        ans3Str = "WRONG";
+//        ans4Str = "WRONG";
 
         switch (correctAns) {
 		case 1:

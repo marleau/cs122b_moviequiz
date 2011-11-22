@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -82,5 +83,9 @@ public class DBAdapter extends SQLiteOpenHelper {
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		//Schema wont change
 		onCreate(db);
+	}
+	
+	public Cursor executeQuery(String sql) {
+		return sqlDB.rawQuery(sql, null);
 	}
 }
