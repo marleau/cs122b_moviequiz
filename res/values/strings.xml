@@ -1,7 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="hello">Hello World, MovieQuiz!</string>
+    <string name="hello">Welcome to MovieQuiz\nSelect an option:</string>
     <string name="app_name">MovieQuiz</string>
+    <string name="takeTheQuiz">Take the Quiz!</string>
+    <string name="statisticsOfQuizzes">Statistics of Quizzes</string>
+    <string name="questionString">Default Question Text?</string>
+    <string name="ans1">Answer 1</string>
+    <string name="ans2">Answer 2</string>
+    <string name="ans4">Answer 4</string>
+    <string name="ans3">Answer 3</string>
+    <string name="timerString">00:00</string>
+    <string name="overallScore">Overall Score:</string>
+    <string name="overallScoreValue">OS</string>
+    <string name="numOfQuiz">Number of Quizzes Taken:</string>
+    <string name="numOfQuizValue">NQ</string>
+    <string name="numOfCorrect">Number of Correct Answers:</string>
+    <string name="numOfCorrectValue">NC</string>
+    <string name="numOfWrong">Number of Incorrect Answers:</string>
+    <string name="avgTimePerQuestion">Average Time Per Question:</string>
+    <string name="avgTimePerQuestionValue">AT:PQ</string>
+    <string name="numOfWrongValue">NI</string>
+    <string name="goBack">Go Back</string>
+    <string name="resetStats">Reset Statistics</string>
 
 </resources>

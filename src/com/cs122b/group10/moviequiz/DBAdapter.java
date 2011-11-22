@@ -11,11 +11,14 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DBAdapter extends SQLiteOpenHelper {
 
-    private static final String DB_NAME = "MovieQuizDB";
+    private static final int STARS = 1;
+	private static final int MOVIES = 0;
+	private static final int STARS_IN_MOVIE = 2;
+	private static final String DB_NAME = "MovieQuizDB";
     private static final int DB_VERSION = 1;
-    private static final String[] ASSETS = {"movies.csv", "stars_in_movies.csv", "stars.csv"};
-    private static final String[] TABLES = {"movies", "stars_in_movies", "stars"};
-    private static final String[][] TABLE_COLS = {{"id", "title", "year", "director"}, {"star_id", "movie_id"}, {"id", "first_name", "last_name"}};
+    private static final String[] ASSETS = {"movies.csv", "stars.csv", "stars_in_movies.csv"};
+    private static final String[] TABLES = {"movies", "stars", "stars_in_movies"};
+    private static final String[][] TABLE_COLS = {{"id", "title", "year", "director"}, {"id", "first_name", "last_name"}, {"star_id", "movie_id"}};
     private SQLiteDatabase sqlDB;
     private Context context;
 
@@ -27,48 +30,57 @@ public class DBAdapter extends SQLiteOpenHelper {
 
     @Override
 	public void onCreate(SQLiteDatabase db) {
+
+        for (String table : TABLES) {
+            db.execSQL("DROP TABLE IF EXISTS " + table);
+        }
+        
         // create tables
         db.execSQL("CREATE TABLE movies(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, year INTEGER NOT NULL, director TEXT NOT NULL);");
         db.execSQL("CREATE TABLE stars_in_movies(star_id INTEGER NOT NULL, movie_id INTEGER NOT NULL);");
         db.execSQL("CREATE TABLE stars(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, first_name TEXT, last_name TEXT);");
+        //TODO create table statistics
+        //game number: int; auto inc
+        //correct: int
+        //wrong: int
+        //duration: long (milliseconds)
 
         // populate tables
-        for (int i = 0; i < 3; i++) {
+        for (int table = 0; table < 3; table++) {
             try {
-                BufferedReader in = new BufferedReader(new InputStreamReader(context.getAssets().open(ASSETS[i])));
+                BufferedReader in = new BufferedReader(new InputStreamReader(context.getAssets().open(ASSETS[table])));
                 String line;
-                System.out.println(TABLES[i]);
+                System.out.println(TABLES[table]);
                 while((line = in.readLine()) != null) {
-                	String temp ="\t";
-                	
-                    for (int j = 0; j < TABLE_COLS[i].length; j++) {
-                        String[] in_vals = line.split(",");
-                        ContentValues values = new ContentValues();
-//                        if (i == 2 || (i == 1 && (j == 1 || j == 3)) || (i == 3 && j == 1)) {
-//                        	values.put(TABLE_COLS[i][j], Integer.getInteger(line));
-//                        } else {
-//                        	values.put(TABLE_COLS[i][j], line);
-//                        }
-                        values.put(TABLE_COLS[i][j], in_vals[j]);
-                        db.insert(TABLES[i], null, values);
-                        
-                        temp += TABLE_COLS[i][j] + ": " + in_vals[j] + "\t ";
-                    }
+//                	String temp ="\t";//DEBUG
+
+                    ContentValues values = new ContentValues();
                     
-                    System.out.println(temp);
+                    for (int column = 0; column < TABLE_COLS[table].length; column++) {
+                        String[] in_vals = line.split(",");
+                        //lol i get it fix for int fields
+                        if (table == STARS_IN_MOVIE || (table == MOVIES && (column == 0 || column == 2)) || (table == STARS && column == 0)) {
+                        	values.put(TABLE_COLS[table][column], Integer.valueOf(in_vals[column]));
+                        } else {
+                        	values.put(TABLE_COLS[table][column], in_vals[column]);
+                        }
+                        
+//                        temp += TABLE_COLS[table][column] + ": " + in_vals[column] + "\t ";//DEBUG
+                    }
+
+                    db.insert(TABLES[table], null, values);
+//                    System.out.println(temp);//DEBUG
                 }
-//                in.close();
+                in.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    @Override
+	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        for (String table : TABLES) {
-            db.execSQL("DROP TABLE IF EXISTS " + table);
-        }
-        onCreate(db);
-    }
+		//Schema wont change
+		onCreate(db);
+	}
 }
