@@ -13,116 +13,120 @@ import android.database.Cursor;
 
 public class QuestionBuilder {
 
-    private DBAdapter db;
-    private String[] answers;
-    private String correct;
-    private String question;
+	private DBAdapter db;
+	private String[] answers;
+	private String correct;
+	private String question;
 
-    public QuestionBuilder(DBAdapter db) {
-        this.db = db;
-        answers = new String[4];
-    }
-    
-    public void nextQuestion() {
-        //buildQuestion(1 + (int)(Math.random() * (8)));
+	public QuestionBuilder(DBAdapter db) {
+		this.db = db;
+		answers = new String[4];
+	}
 
-        // for test
-        buildQuestion(1);
-    }
+	public void nextQuestion() {
+		// buildQuestion(1 + (int)(Math.random() * (8)));
 
-    public String getQuestion() {
-        return question;
-    }
+		// for test
+		buildQuestion(1);
+	}
 
-    public String getCorrectAnswer() {
-        return correct;
-    }
-    
-    public String[] getAnswers() {
-        return answers;
-    }
+	public String getQuestion() {
+		return question;
+	}
 
-    private void buildQuestion(int i) {
-        switch (i) {
-            case 1:
-                 buildWhoDirectedMovie();
-            case 2:
-                 buildWhenMovieReleased();
-            case 3:
-                 buildStarInOrNotOneMovie();
-            case 4:
-                 buildMovieWithTwoStars();
-            case 5:
-                 buildWhoDirectedOrNotStar();
-            case 6:
-                 buildWhichStarInBothMovies();
-            case 7:
-                 buildWhichStarNotInSameMovieWithStar();
-            case 8:
-                 buildWhoDirectedStarInYear();
-            default:
-            	 buildWhoDirectedMovie();
-        }
-    }
+	public String getCorrectAnswer() {
+		return correct;
+	}
 
-// 1. Who directed the movie X?
-    private void buildWhoDirectedMovie() {
-        String query = "SELECT title, director FROM movies ORDER BY RANDOM() LIMIT 4";
-        Cursor cur = db.executeQuery(query);
-        cur.moveToFirst();
-        String director = cur.getString(1);
-        String movie = cur.getString(0);
-        correct = director.substring(1, director.length()-1);
-        int count = 0;
+	public String[] getAnswers() {
+		return answers;
+	}
 
-        while (count < 4) {
-            cur.moveToNext();
-            String currentD = cur.getString(1);
-//            if (!currentD.equals(director)) {
-                answers[count] = currentD;//TODO remove quotes
-                count++;
-//            }
-        }
+	private void buildQuestion(int i) {
+		switch (i) {
+		case 1:
+			buildWhoDirectedMovie();
+		case 2:
+			buildWhenMovieReleased();
+		case 3:
+			buildStarInOrNotOneMovie();
+		case 4:
+			buildMovieWithTwoStars();
+		case 5:
+			buildWhoDirectedOrNotStar();
+		case 6:
+			buildWhichStarInBothMovies();
+		case 7:
+			buildWhichStarNotInSameMovieWithStar();
+		case 8:
+			buildWhoDirectedStarInYear();
+		default:
+			buildWhoDirectedMovie();
+		}
+	}
 
-        question = "Who directed the movie\n" + movie + "?";
-    }
+	// 1. Who directed the movie X?
+	private void buildWhoDirectedMovie() {
+		String query = "SELECT title, director FROM movies ORDER BY RANDOM() LIMIT 1";
+		Cursor cur = db.executeQuery(query);
+		cur.moveToFirst();
+		String director = cur.getString(1);
+		String movie = cur.getString(0);
+		correct = director.substring(1, director.length() - 1);
 
-// 2. When was the movie X released?
-    private void buildWhenMovieReleased() {
-        question = "";
-    }
+		populateAnswersDirectors(director);
 
-// 3. Which star (was/was not) in the movie X?
-    private void buildStarInOrNotOneMovie() {
-        question = "";
-    }
+		question = "Who directed the movie\n" + movie + "?";
+	}
 
-// 4. In which movie the stars X and Y appear together?
-    private void buildMovieWithTwoStars() {
-        question = "";
-    }
+	private void populateAnswersDirectors(String notThisDirector) {
+		String getDirs = "SELECT DISTINCT director FROM movies ORDER BY RANDOM() LIMIT 5";
+		Cursor dirCur = db.executeQuery(getDirs);
+		for (int count = 0; count < 4;) {
+			dirCur.moveToNext();
+			String currentD = dirCur.getString(0);
+			if (!currentD.equals(notThisDirector)) {
+				answers[count++] = currentD;// TODO remove quotes
+			}
+		}
+	}
 
-// 5. Who directed/did not direct the star X?
-    private void buildWhoDirectedOrNotStar() {
-        question = "";
-    }
+	// 2. When was the movie X released?
+	private void buildWhenMovieReleased() {
+		question = "";
+	}
 
-// 6. Which star appears in both movies X and Y?
-    private void buildWhichStarInBothMovies() {
-        question = "";
-    }
+	// 3. Which star (was/was not) in the movie X?
+	private void buildStarInOrNotOneMovie() {
+		question = "";
+	}
 
-// 7. Which star did not appear in the same movie with the star X?
-    private void buildWhichStarNotInSameMovieWithStar() {
-        question = "";
-    }
+	// 4. In which movie the stars X and Y appear together?
+	private void buildMovieWithTwoStars() {
+		question = "";
+	}
 
-// 8. Who directed the star X in year Y?
-    private void buildWhoDirectedStarInYear() {
-        question = "";
-    }
+	// 5. Who directed/did not direct the star X?
+	private void buildWhoDirectedOrNotStar() {
+		question = "";
+	}
 
-    public void close(){
-    	db.close();
-    }
+	// 6. Which star appears in both movies X and Y?
+	private void buildWhichStarInBothMovies() {
+		question = "";
+	}
+
+	// 7. Which star did not appear in the same movie with the star X?
+	private void buildWhichStarNotInSameMovieWithStar() {
+		question = "";
+	}
+
+	// 8. Who directed the star X in year Y?
+	private void buildWhoDirectedStarInYear() {
+		question = "";
+	}
+
+	public void close() {
+		db.close();
+	}
 }
