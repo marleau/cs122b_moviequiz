@@ -12,8 +12,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 public class Question extends Activity {
-//	private static final long duration = 180000;// 3 minutes
-	private static final long duration = 20000;// 20 sec
+	private static final long duration = 180000;// 3 minutes
+//	private static final long duration = 20000;// 20 sec
 
 	// Setup Timer
 	private TextView timerText;
@@ -129,13 +129,6 @@ public class Question extends Activity {
 
 	private void generateQuestion() {
 		// create question
-		/*
-		 * Who directed the movie X? When was the movie X released? Which star
-		 * (was/was not) in the movie X? In which movie the stars X and Y appear
-		 * together? Who directed/did not direct the star X? Which star appears
-		 * in both movies X and Y? Which star did not appear in the same movie
-		 * with the star X? Who directed the star X in year Y?
-		 */
 		Random rand = new Random();
 
 		// generate correct answer and random wrong answers
@@ -465,20 +458,6 @@ public class Question extends Activity {
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
-		/*
-		 * When the user pauses the application, it can be killed by the system
-		 * in extremely low memory situations. Your program should save
-		 * everything (e.g., current question, timer, and statistics) properly
-		 * and be able to resume later. Take a look at this page to learn more
-		 * about life cycles in an Android program. You can override
-		 * onSaveInstanceState() method to save the current state. Please refer
-		 * to this example. A good way to test your application's ability to
-		 * restore its state is to simply rotate the device so that the screen
-		 * orientation changes. (You can simulate rotation on your emulator by
-		 * pressing Ctrl-F11.) When the screen orientation changes, the system
-		 * destroys and recreates the activity in order to apply alternative
-		 * resources that might be available for the new orientation.
-		 */
 		// save all values
 
 		outState.putLong("mStartTime", mStartTime);
