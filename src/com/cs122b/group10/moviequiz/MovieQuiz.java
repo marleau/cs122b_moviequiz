@@ -40,6 +40,7 @@ public class MovieQuiz extends Activity {
         
         //Setting up inital DB
         db = new DBAdapter(this);
+        //Reset DB
 //        db.onCreate(db.getWritableDatabase());
     }
 
