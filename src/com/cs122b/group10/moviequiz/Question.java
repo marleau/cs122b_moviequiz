@@ -12,7 +12,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 public class Question extends Activity {
-	private static final long duration = 180000;// 3 minutes
+//	private static final long duration = 180000;// 3 minutes
+	private static final long duration = 20000;// 20 sec
 
 	// Setup Timer
 	private TextView timerText;
@@ -37,6 +38,8 @@ public class Question extends Activity {
 				mHandler.postAtTime(this, now + 1000);
 			} else {
 				// Game Over -- tally results and display
+				updateScore();
+				updateDialogs();
 				submitStats();
 				mHandler.removeCallbacks(this);
 				showGameOver();
@@ -326,9 +329,10 @@ public class Question extends Activity {
 			public void onClick(DialogInterface dialog, int id) {
 				// submit stats
 				showAlertExit = false;
-				updateScore();
-				submitStats();
 				elapsedTime = SystemClock.uptimeMillis() - mStartTime;
+				updateScore();
+				updateDialogs();
+				submitStats();
 				mHandler.removeCallbacks(quizTimer);
 				showGameOver();
 				dialog.cancel();
@@ -369,7 +373,12 @@ public class Question extends Activity {
 	}
 
 	private void showGameOver() {
-		updateDialogs();
+		showAlertCorrect = false;
+		alertCorrect.dismiss();
+		showAlertWrong = false;
+		alertWrong.dismiss();
+		showAlertExit = false;
+		alertExit.dismiss();
 		showAlertGameOver = true;
 		alertGameOver.show();
 	}
