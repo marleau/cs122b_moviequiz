@@ -16,7 +16,7 @@ import android.database.Cursor;
 
 public class QuestionBuilder {
 
-    private static final int NUMBER_OF_TYPES = 3;//Types of questions
+    private static final int NUMBER_OF_TYPES = 4;//Types of questions
     private DBAdapter db;
     private String[] answers;
     private String correct;
@@ -34,7 +34,7 @@ public class QuestionBuilder {
         correct = "";
         question = "";
         int type = rand.nextInt(NUMBER_OF_TYPES)+1;
-        System.out.println("Q Type: "+type);
+        //int type = 4;
         buildQuestion(type);
     }
 
@@ -93,8 +93,6 @@ public class QuestionBuilder {
         correct = cleanAnswer(director);
         question = "Who directed the movie " + movie + "?";
 
-        //populateAnswersDirectors(director);
-        //cursor = db.executeQuery("SELECT DISTINCT director FROM movies ORDER BY RANDOM() LIMIT 10");
         populateWrongAnswers(true, db.executeQuery("SELECT DISTINCT director FROM movies WHERE director != "+director+" ORDER BY RANDOM() LIMIT 5"));
     }
 
@@ -109,79 +107,86 @@ public class QuestionBuilder {
         correct = year;
         question = "When was " + title + " released?";
 
-        //populateAnswersYears(year);
-        //cursor = db.executeQuery("SELECT DISTINCT year FROM movies ORDER BY RANDOM() LIMIT 10");
         populateWrongAnswers(false, db.executeQuery("SELECT DISTINCT year FROM movies WHERE year != "+year+" ORDER BY RANDOM() LIMIT 5"));
     }
-    
+
     // 3. Which star (was/was not) in the movie X?
     private void buildStarInOrNotOneMovie() {
-    	final String stars_movies_join = "movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id";
-    	final String star_in_query = "SELECT DISTINCT stars.name FROM " + stars_movies_join + " AND movies.id = ? ORDER BY RANDOM()";
-    	final String star_out_query = "SELECT DISTINCT stars.name FROM " + stars_movies_join + " AND movies.id != ? ORDER BY RANDOM()";
-    	final String movie_query = "SELECT title, id FROM movies ORDER BY RANDOM() LIMIT 1";
+        final String stars_movies_join = "movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id";
+        final String star_in_query = "SELECT DISTINCT stars.name FROM " + stars_movies_join + " AND movies.id = ? ORDER BY RANDOM()";
+        final String star_out_query = "SELECT DISTINCT stars.name FROM " + stars_movies_join + " AND movies.id != ? ORDER BY RANDOM()";
+        final String movie_query = "SELECT title, id FROM movies ORDER BY RANDOM() LIMIT 1";
         final int state = rand.nextInt(2); // 0: is not in movie, 1: is no movie
-        
+
         final Cursor movie_cursor = db.executeQuery(movie_query);
         movie_cursor.moveToFirst();
         final String movie = movie_cursor.getString(0);
         final int movie_id = movie_cursor.getInt(1);
 
         if (state == 0) {
-        	question="Which star was not in "+movie+"?";
+            question="Which star was not in "+movie+"?";
             populateWrongAnswers(true, db.executeQuery(star_in_query, Integer.toString(movie_id)));
             populateCorrectAnswer(true, db.executeQuery(star_out_query, Integer.toString(movie_id)));
         } else {
-        	question="Which star was in "+movie+"?";
-        	populateCorrectAnswer(true, db.executeQuery(star_in_query, Integer.toString(movie_id)));
+            question="Which star was in "+movie+"?";
+            populateCorrectAnswer(true, db.executeQuery(star_in_query, Integer.toString(movie_id)));
             populateWrongAnswers(true, db.executeQuery(star_out_query, Integer.toString(movie_id)));
         }
     }
 
     // 4. In which movie the stars X and Y appear together?
     private void buildMovieWithTwoStars() {
-        String title="";
-        question = "In which movie the stars X and Y appear together?";
+
+        final String two_stars_query = "SELECT DISTINCT movies.id, movies.title, stars1.id, stars1.name, stars2.id, stars2.name FROM movies, stars AS stars1, stars AS stars2, stars_in_movies AS stars_in_movies1, stars_in_movies AS stars_in_movies2 WHERE stars_in_movies1.movie_id = movies.id AND stars_in_movies2.movie_id = movies.id AND stars_in_movies1.star_id = stars1.id AND stars_in_movies2.star_id = stars2.id AND stars1.id != stars2.id ORDER BY RANDOM() LIMIT 1";
+        final Cursor two_stars_cursor = db.executeQuery(two_stars_query);
+        two_stars_cursor.moveToFirst();
+        final int movie_id = two_stars_cursor.getInt(0);
+        final String movie = two_stars_cursor.getString(1);
+        final int star1_id = two_stars_cursor.getInt(2);
+        final String star1 = two_stars_cursor.getString(3);
+        final int star2_id = two_stars_cursor.getInt(4);
+        final String star2 = two_stars_cursor.getString(5);
+        System.out.println("movie id: "+movie_id+"\t"+"star id:" + star1_id + ", " + star2_id);
+
+        correct = cleanAnswer(movie);
+        question = "In which movie, did "+cleanAnswer(star1)+" and "+cleanAnswer(star2)+" appear together?";
+
+        final String wrong_query = "SELECT DISTINCT movies.title FROM movies, stars_in_movies AS stars1, stars_in_movies AS stars2  WHERE stars1.movie_id = movies.id AND stars2.movie_id = movies.id AND movies.id != ? AND stars1.star_id != ? AND stars2.star_id != ? ORDER BY RANDOM()";
+        populateWrongAnswers(true, db.executeQuery(wrong_query, Integer.toString(movie_id), Integer.toString(star1_id), Integer.toString(star2_id)));
     }
 
     // 5. Who directed/did not direct the star X?
     private void buildWhoDirectedOrNotStar() {
-        String director="";
         question = "Who directed/did not direct the star X?";
     }
 
     // 6. Which star appears in both movies X and Y?
     private void buildWhichStarInBothMovies() {
-        String first_name="";
-        String last_name="";
         question="Which star appears in both movies X and Y?";
     }
 
     // 7. Which star did not appear in the same movie with the star X?
     private void buildWhichStarNotInSameMovieWithStar() {
-        String first_name="";
-        String last_name="";
         question="Which star did not appear in the same movie with the star X?";
     }
 
     // 8. Who directed the star X in year Y?
     private void buildWhoDirectedStarInYear() {
-        String director="";
         question = "Who directed the star X in year Y?";
     }
 
     private void populateCorrectAnswer(boolean isString, Cursor cursor) {
-    	cursor.moveToNext();
-    	correct = isString ? cleanAnswer(cursor.getString(0)) : cursor.getString(0);
+        cursor.moveToNext();
+        correct = isString ? cleanAnswer(cursor.getString(0)) : cursor.getString(0);
     }
-    
+
     // check potential answer against correct answer and exsiting answers
     // make sure that index 0 has the answer
     private void populateWrongAnswers(boolean isString, Cursor cursor) {
-    	int count = 0;
-    	
+        int count = 0;
+
         while (count < 4 && cursor.moveToNext()) {
-        	answers[count++] = isString ? cleanAnswer(cursor.getString(0)) : cursor.getString(0);
+            answers[count++] = isString ? cleanAnswer(cursor.getString(0)) : cursor.getString(0);
         }
     }
 
