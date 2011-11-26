@@ -19,7 +19,7 @@ public class DBAdapter extends SQLiteOpenHelper {
     private static final int DB_VERSION = 1;
     private static final String[] ASSETS = {"movies.csv", "stars.csv", "stars_in_movies.csv"};
     private static final String[] TABLES = {"movies", "stars", "stars_in_movies", "statistics"};
-    private static final String[][] TABLE_COLS = {{"id", "title", "year", "director"}, {"id", "first_name", "last_name"}, {"star_id", "movie_id"}};
+    private static final String[][] TABLE_COLS = {{"id", "title", "year", "director"}, {"id", "name"}, {"star_id", "movie_id"}};
     private SQLiteDatabase sqlDB;
     private Context context;
 
@@ -39,7 +39,7 @@ public class DBAdapter extends SQLiteOpenHelper {
         // create tables
         db.execSQL("CREATE TABLE movies(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, year INTEGER NOT NULL, director TEXT NOT NULL);");
         db.execSQL("CREATE TABLE stars_in_movies(star_id INTEGER NOT NULL, movie_id INTEGER NOT NULL);");
-        db.execSQL("CREATE TABLE stars(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, first_name TEXT, last_name TEXT);");
+        db.execSQL("CREATE TABLE stars(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, name TEXT);");
         db.execSQL("CREATE TABLE statistics(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, correct_cnt INTEGER, wrong_cnt INTEGER, duration LONG);");
 
         // populate tables
@@ -49,7 +49,6 @@ public class DBAdapter extends SQLiteOpenHelper {
                 String line;
                 System.out.println(TABLES[table]);
                 while((line = in.readLine()) != null) {
-//                	String temp ="\t";//DEBUG
 
                     ContentValues values = new ContentValues();
                     
@@ -61,12 +60,9 @@ public class DBAdapter extends SQLiteOpenHelper {
                         } else {
                         	values.put(TABLE_COLS[table][column], in_vals[column]);
                         }
-                        
-//                        temp += TABLE_COLS[table][column] + ": " + in_vals[column] + "\t ";//DEBUG
                     }
 
                     db.insert(TABLES[table], null, values);
-//                    System.out.println(temp);//DEBUG
                 }
                 in.close();
             } catch (IOException e) {
@@ -81,7 +77,7 @@ public class DBAdapter extends SQLiteOpenHelper {
 		onCreate(db);
 	}
 	
-	public Cursor executeQuery(String sql) {
-		return sqlDB.rawQuery(sql, null);
+	public Cursor executeQuery(String sql, String... names) {
+		return sqlDB.rawQuery(sql, names);
 	}
 }

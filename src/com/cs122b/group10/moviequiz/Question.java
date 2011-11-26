@@ -129,6 +129,7 @@ public class Question extends Activity {
 		qb.nextQuestion();
         		
 		currentQuestion = "Question #"+String.valueOf(numAnsCorr+numAnsWron+1)+"\n"+qb.getQuestion();
+		System.out.println(currentQuestion);
 		
         correctAns = rand.nextInt(4) + 1;//should be random 1-4
         
