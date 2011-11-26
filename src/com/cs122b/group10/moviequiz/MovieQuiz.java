@@ -40,7 +40,8 @@ public class MovieQuiz extends Activity {
         
         //Setting up inital DB
         db = new DBAdapter(this);
-        db.onCreate(db.getWritableDatabase());
+        //Recreate DB, slow; uncomment to use
+//        db.onCreate(db.getWritableDatabase());
     }
 
 	@Override
