@@ -113,16 +113,18 @@ public class QuestionBuilder {
     // 3. Which star (was/was not) in the movie X?
     private void buildStarInOrNotOneMovie() {
         final String stars_movies_join = "movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id";
-        final String star_in_query = "SELECT DISTINCT stars.name FROM " + stars_movies_join + " AND movies.id = ? ORDER BY RANDOM() LIMIT 5";
-        final String star_out_query = "SELECT DISTINCT stars.name FROM " + stars_movies_join + " AND movies.id != ? ORDER BY RANDOM() LIMIT 5";
+        final String star_in_query = "SELECT DISTINCT stars.name FROM " + stars_movies_join + " AND movies.id = ? ORDER BY RANDOM() LIMIT 10";
+        final String star_out_query = "SELECT DISTINCT stars.name FROM " + stars_movies_join + " AND movies.id != ? ORDER BY RANDOM() LIMIT 10";
         final String movie_query = "SELECT title, id FROM movies ORDER BY RANDOM() LIMIT 1";
-        final int state = rand.nextInt(2); // 0: is not in movie, 1: is no movie
+        final int state = rand.nextInt(2); // 0: is not in movie, 1: is in movie
 
         final Cursor movie_cursor = db.executeQuery(movie_query);
         movie_cursor.moveToFirst();
         final String movie = movie_cursor.getString(0);
         final int movie_id = movie_cursor.getInt(1);
 
+        //FIXME =========== Shows blank answer sometimes for "which star was not in" ===============
+        
         if (state == 0) {
             question="Which star was not in "+movie+"?";
             populateWrongAnswers(true, db.executeQuery(star_in_query, Integer.toString(movie_id)));
@@ -163,9 +165,11 @@ public class QuestionBuilder {
         star_cursor.moveToFirst();
         final String star = star_cursor.getString(0);
         final int star_id = star_cursor.getInt(1);
-        final String did_direct_query = "SELECT DISTINCT movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id AND stars.id = ? ORDER BY RANDOM() LIMIT 5";
-        final String not_direct_query = "SELECT DISTINCT movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id AND stars.id != ? ORDER BY RANDOM() LIMIT 5";
+        final String did_direct_query = "SELECT DISTINCT movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id AND stars.id = ? ORDER BY RANDOM() LIMIT 10";
+        final String not_direct_query = "SELECT DISTINCT movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id AND stars.id != ? ORDER BY RANDOM() LIMIT 10";
 
+        //FIXME =========== Shows blank answer sometimes for "who did not direct" =============
+        
         if (state == 0) {
             question = "Who has not directed "+cleanAnswer(star)+"?";
             populateWrongAnswers(true, db.executeQuery(did_direct_query, Integer.toString(star_id)));
