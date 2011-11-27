@@ -33,8 +33,8 @@ public class QuestionBuilder {
         for (int i = 0; i < 4; i++) { answers[i] = ""; }
         correct = "";
         question = "";
-        //int type = rand.nextInt(NUMBER_OF_TYPES)+1;
-        int type = 6;
+        int type = rand.nextInt(NUMBER_OF_TYPES)+1;
+//        int type = 6;
         buildQuestion(type);
     }
 
@@ -149,7 +149,7 @@ public class QuestionBuilder {
         System.out.println("movie id: "+movie_id+"\t"+"star id:" + star1_id + ", " + star2_id);
 
         correct = cleanAnswer(movie);
-        question = "In which movie, did "+cleanAnswer(star1)+" and "+cleanAnswer(star2)+" appear together?";
+        question = "In which movie did "+cleanAnswer(star1)+" and "+cleanAnswer(star2)+" appear together?";
 
         final String wrong_query = "SELECT DISTINCT movies.title FROM movies, stars_in_movies AS stars1, stars_in_movies AS stars2  WHERE stars1.movie_id = movies.id AND stars2.movie_id = movies.id AND movies.id != ? AND stars1.star_id != ? AND stars2.star_id != ? ORDER BY RANDOM() LIMIT 5";
         populateWrongAnswers(true, db.executeQuery(wrong_query, Integer.toString(movie_id), Integer.toString(star1_id), Integer.toString(star2_id)));
@@ -167,11 +167,11 @@ public class QuestionBuilder {
         final String not_direct_query = "SELECT DISTINCT movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id AND stars.id != ? ORDER BY RANDOM() LIMIT 5";
 
         if (state == 0) {
-            question = "Who did not direct "+cleanAnswer(star)+"?";
+            question = "Who has not directed "+cleanAnswer(star)+"?";
             populateWrongAnswers(true, db.executeQuery(did_direct_query, Integer.toString(star_id)));
             populateCorrectAnswer(true, db.executeQuery(not_direct_query, Integer.toString(star_id)));
         } else {
-            question = "Who directed "+cleanAnswer(star)+"?";
+            question = "Who has directed "+cleanAnswer(star)+"?";
             populateWrongAnswers(true, db.executeQuery(not_direct_query, Integer.toString(star_id)));
             populateCorrectAnswer(true, db.executeQuery(did_direct_query, Integer.toString(star_id)));
         }
