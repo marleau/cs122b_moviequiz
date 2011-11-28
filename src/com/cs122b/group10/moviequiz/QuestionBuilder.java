@@ -122,9 +122,8 @@ public class QuestionBuilder {
         final String movie = movie_cursor.getString(0);
         final int movie_id = movie_cursor.getInt(1);
 
-        //FIXME =========== Shows blank answer sometimes for "which star was not in" ===============
-        
         if (state == 0) {
+            // Stars may not appear in 4 or more movies. So there may be less than 4 WRONG choices.
             question="Which star was not in "+movie+"?";
             populateWrongAnswers(true, db.executeQuery(star_in_query, Integer.toString(movie_id)));
             populateCorrectAnswer(true, db.executeQuery(star_out_query, Integer.toString(movie_id)));
@@ -167,9 +166,8 @@ public class QuestionBuilder {
         final String did_direct_query = "SELECT DISTINCT movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id AND stars.id = ? ORDER BY RANDOM() LIMIT 10";
         final String not_direct_query = "SELECT DISTINCT movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id AND stars.id != ? ORDER BY RANDOM() LIMIT 10";
 
-        //FIXME =========== Shows blank answer sometimes for "who did not direct" =============
-        
         if (state == 0) {
+            // The number of directors who worked with an actor maybe be less than 4. So there may be less than 4 WRONG choices.
             question = "Who has not directed "+cleanAnswer(star)+"?";
             populateWrongAnswers(true, db.executeQuery(did_direct_query, Integer.toString(star_id)));
             populateCorrectAnswer(true, db.executeQuery(not_direct_query, Integer.toString(star_id)));
