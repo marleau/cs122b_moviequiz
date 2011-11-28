@@ -33,8 +33,7 @@ public class QuestionBuilder {
         for (int i = 0; i < 4; i++) { answers[i] = ""; }
         correct = "";
         question = "";
-        //int type = rand.nextInt(NUMBER_OF_TYPES)+1;
-        int type = 7;
+        int type = rand.nextInt(NUMBER_OF_TYPES)+1;
         buildQuestion(type);
     }
 
@@ -113,16 +112,18 @@ public class QuestionBuilder {
     // 3. Which star (was/was not) in the movie X?
     private void buildStarInOrNotOneMovie() {
         final String stars_movies_join = "movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id";
-        final String star_in_query = "SELECT DISTINCT stars.name FROM " + stars_movies_join + " AND movies.id = ? ORDER BY RANDOM() LIMIT 5";
-        final String star_out_query = "SELECT DISTINCT stars.name FROM " + stars_movies_join + " AND movies.id != ? ORDER BY RANDOM() LIMIT 5";
+        final String star_in_query = "SELECT DISTINCT stars.name FROM " + stars_movies_join + " AND movies.id = ? ORDER BY RANDOM() LIMIT 10";
+        final String star_out_query = "SELECT DISTINCT stars.name FROM " + stars_movies_join + " AND movies.id != ? ORDER BY RANDOM() LIMIT 10";
         final String movie_query = "SELECT title, id FROM movies ORDER BY RANDOM() LIMIT 1";
-        final int state = rand.nextInt(2); // 0: is not in movie, 1: is no movie
+        final int state = rand.nextInt(2); // 0: is not in movie, 1: is in movie
 
         final Cursor movie_cursor = db.executeQuery(movie_query);
         movie_cursor.moveToFirst();
         final String movie = movie_cursor.getString(0);
         final int movie_id = movie_cursor.getInt(1);
 
+        //FIXME =========== Shows blank answer sometimes for "which star was not in" ===============
+        
         if (state == 0) {
             question="Which star was not in "+movie+"?";
             populateWrongAnswers(true, db.executeQuery(star_in_query, Integer.toString(movie_id)));
@@ -149,7 +150,7 @@ public class QuestionBuilder {
         System.out.println("movie id: "+movie_id+"\t"+"star id:" + star1_id + ", " + star2_id);
 
         correct = cleanAnswer(movie);
-        question = "In which movie, did "+cleanAnswer(star1)+" and "+cleanAnswer(star2)+" appear together?";
+        question = "In which movie did "+cleanAnswer(star1)+" and "+cleanAnswer(star2)+" appear together?";
 
         final String wrong_query = "SELECT DISTINCT movies.title FROM movies, stars_in_movies AS stars1, stars_in_movies AS stars2  WHERE stars1.movie_id = movies.id AND stars2.movie_id = movies.id AND movies.id != ? AND stars1.star_id != ? AND stars2.star_id != ? ORDER BY RANDOM() LIMIT 5";
         populateWrongAnswers(true, db.executeQuery(wrong_query, Integer.toString(movie_id), Integer.toString(star1_id), Integer.toString(star2_id)));
@@ -163,15 +164,17 @@ public class QuestionBuilder {
         star_cursor.moveToFirst();
         final String star = star_cursor.getString(0);
         final int star_id = star_cursor.getInt(1);
-        final String did_direct_query = "SELECT DISTINCT movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id AND stars.id = ? ORDER BY RANDOM() LIMIT 5";
-        final String not_direct_query = "SELECT DISTINCT movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id AND stars.id != ? ORDER BY RANDOM() LIMIT 5";
+        final String did_direct_query = "SELECT DISTINCT movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id AND stars.id = ? ORDER BY RANDOM() LIMIT 10";
+        final String not_direct_query = "SELECT DISTINCT movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id AND stars.id != ? ORDER BY RANDOM() LIMIT 10";
 
+        //FIXME =========== Shows blank answer sometimes for "who did not direct" =============
+        
         if (state == 0) {
-            question = "Who did not direct "+cleanAnswer(star)+"?";
+            question = "Who has not directed "+cleanAnswer(star)+"?";
             populateWrongAnswers(true, db.executeQuery(did_direct_query, Integer.toString(star_id)));
             populateCorrectAnswer(true, db.executeQuery(not_direct_query, Integer.toString(star_id)));
         } else {
-            question = "Who directed "+cleanAnswer(star)+"?";
+            question = "Who has directed "+cleanAnswer(star)+"?";
             populateWrongAnswers(true, db.executeQuery(not_direct_query, Integer.toString(star_id)));
             populateCorrectAnswer(true, db.executeQuery(did_direct_query, Integer.toString(star_id)));
         }
@@ -220,7 +223,18 @@ public class QuestionBuilder {
 
     // 8. Who directed the star X in year Y?
     private void buildWhoDirectedStarInYear() {
-        final String directory_query = "SELECT movies.director, movies.year, stars.id, stars.name FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id";
+        final String director_query = "SELECT movies.director, movies.year, stars.id, stars.name FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id ORDER BY RANDOM() LIMIT 1";
+        final Cursor director_cursor = db.executeQuery(director_query);
+        director_cursor.moveToFirst();
+        final String director = director_cursor.getString(0);
+        final int year = director_cursor.getInt(1);
+        final int star_id = director_cursor.getInt(2);
+        final String star = director_cursor.getString(3);
+        final String notDirect_query = "SELECT DISTINCT movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id AND stars.id != "+star_id+" AND movies.year != "+year+" AND movies.director != "+director+" ORDER BY RANDOM() LIMIT 5";
+        
+        question = "Who directed " + cleanAnswer(star) + " in " + year + "?";
+        correct = cleanAnswer(director);
+        populateWrongAnswers(true, db.executeQuery(notDirect_query));
     }
 
     private void populateCorrectAnswer(boolean isString, Cursor cursor) {
