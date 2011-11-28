@@ -34,7 +34,7 @@ public class QuestionBuilder {
         correct = "";
         question = "";
         //int type = rand.nextInt(NUMBER_OF_TYPES)+1;
-        int type = 6;
+        int type = 7;
         buildQuestion(type);
     }
 
@@ -200,10 +200,27 @@ public class QuestionBuilder {
 
     // 7. Which star did not appear in the same movie with the star X?
     private void buildWhichStarNotInSameMovieWithStar() {
+        final String twoStarsInMovie_query = "SELECT DISTINCT s2.name, s2.id FROM movies, stars AS s1, stars AS s2, stars_in_movies AS in1, stars_in_movies AS in2 WHERE movies.id = in1.movie_id AND movies.id = in2.movie_id AND in1.star_id = s1.id AND in2.star_id = s2.id AND s1.id != s2.id ORDER BY RANDOM() LIMIT 1";
+        final Cursor star_cursor = db.executeQuery(twoStarsInMovie_query);
+        star_cursor.moveToFirst();
+        final int star_id = star_cursor.getInt(1);
+        final String star = star_cursor.getString(0);
+        final String starsWithStar_query = "SELECT DISTINCT s2.name FROM movies, stars AS s1, stars AS s2, stars_in_movies AS in1, stars_in_movies AS in2 WHERE movies.id = in1.movie_id AND movies.id = in2.movie_id AND in1.star_id = s1.id AND in2.star_id = s2.id AND s1.id != s2.id AND s1.id = ?";
+        final String notInSame_query = "SELECT DISTINCT stars.name FROM stars WHERE NOT EXISTS ("+starsWithStar_query+" AND s2.id = stars.id) ORDER BY RANDOM() LIMIT 1";
+        final Cursor correct_cursor = db.executeQuery(notInSame_query, Integer.toString(star_id));
+        correct_cursor.moveToFirst();
+        final String correct_star = correct_cursor.getString(0);
+        
+        System.out.println("star:" +star_id);
+
+        question = "Which star did not appear in the same movie with " + cleanAnswer(star) + "?";
+        correct = cleanAnswer(correct_star);
+        populateWrongAnswers(true, db.executeQuery(starsWithStar_query, Integer.toString(star_id)));
     }
 
     // 8. Who directed the star X in year Y?
     private void buildWhoDirectedStarInYear() {
+        final String directory_query = "SELECT movies.director, movies.year, stars.id, stars.name FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id";
     }
 
     private void populateCorrectAnswer(boolean isString, Cursor cursor) {
