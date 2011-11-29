@@ -113,6 +113,7 @@ public class QuestionBuilder {
     private void buildStarInOrNotOneMovie() {
         final String stars_movies_join = "movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id";
         final String star_in_query = "SELECT DISTINCT stars.name FROM " + stars_movies_join + " AND movies.id = ? ORDER BY RANDOM() LIMIT 10";
+        //FIXME must me a WHERE NOT IN clause
         final String star_out_query = "SELECT DISTINCT stars.name FROM " + stars_movies_join + " AND movies.id != ? ORDER BY RANDOM() LIMIT 10";
         final String movie_query = "SELECT title, id FROM movies ORDER BY RANDOM() LIMIT 1";
         final int state = rand.nextInt(2); // 0: is not in movie, 1: is in movie
@@ -151,6 +152,7 @@ public class QuestionBuilder {
         correct = cleanAnswer(movie);
         question = "In which movie did "+cleanAnswer(star1)+" and "+cleanAnswer(star2)+" appear together?";
 
+        //FIXME must me a WHERE NOT IN clause
         final String wrong_query = "SELECT DISTINCT movies.title FROM movies, stars_in_movies AS stars1, stars_in_movies AS stars2  WHERE stars1.movie_id = movies.id AND stars2.movie_id = movies.id AND movies.id != ? AND stars1.star_id != ? AND stars2.star_id != ? ORDER BY RANDOM() LIMIT 5";
         populateWrongAnswers(true, db.executeQuery(wrong_query, Integer.toString(movie_id), Integer.toString(star1_id), Integer.toString(star2_id)));
     }
@@ -166,6 +168,15 @@ public class QuestionBuilder {
         final String did_direct_query = "SELECT DISTINCT movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id AND stars.id = ? ORDER BY RANDOM() LIMIT 10";
         final String not_direct_query = "SELECT DISTINCT m.director FROM movies AS m WHERE m.director NOT IN (select movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id=movies.id AND stars_in_movies.star_id=stars.id AND stars.id=?) ORDER BY RANDOM() LIMIT 10";
 
+        //FIXME sometimes returns only one answer or incorrecct answers
+        //e.g. "Who has not directed Meryl Streep?"
+        // "Ben Younger", "", "", ""
+        
+        //FIXME doesnt return answers sometimes
+        //"Who has not directed Hugh Grant?"
+        //"Chris Weitz", "Steven Soderbergh", "Gus Van Sant", ""
+        // Chris and Steven have directed Hugh but blank space should be "Richard Curtis"
+        
         if (state == 0) {
             // The number of directors who worked with an actor maybe be less than 4. So there may be less than 4 WRONG choices.
             question = "Who has not directed "+cleanAnswer(star)+"?";
@@ -178,7 +189,7 @@ public class QuestionBuilder {
         }
     }
 
-SELECT DISTINCT m.director FROM movies AS m WHERE m.director NOT IN (select movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id=movies.id AND stars_in_movies.star_id=stars.id AND stars.id=412029) ORDER BY RANDOM() LIMIT 10;
+//SELECT DISTINCT m.director FROM movies AS m WHERE m.director NOT IN (select movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id=movies.id AND stars_in_movies.star_id=stars.id AND stars.id=412029) ORDER BY RANDOM() LIMIT 10;
 
     // 6. Which star appears in both movies X and Y?
     private void buildWhichStarInBothMovies() {
@@ -230,7 +241,10 @@ SELECT DISTINCT m.director FROM movies AS m WHERE m.director NOT IN (select movi
         final int year = director_cursor.getInt(1);
         final int star_id = director_cursor.getInt(2);
         final String star = director_cursor.getString(3);
+        //FIXME must me a WHERE NOT IN clause
         final String notDirect_query = "SELECT DISTINCT movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id AND stars.id != "+star_id+" AND movies.year != "+year+" AND movies.director != "+director+" ORDER BY RANDOM() LIMIT 5";
+        
+        //FIXME returns same answer twice
         
         question = "Who directed " + cleanAnswer(star) + " in " + year + "?";
         correct = cleanAnswer(director);
