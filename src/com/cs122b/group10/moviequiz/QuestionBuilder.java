@@ -164,7 +164,7 @@ public class QuestionBuilder {
         final String star = star_cursor.getString(0);
         final int star_id = star_cursor.getInt(1);
         final String did_direct_query = "SELECT DISTINCT movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id AND stars.id = ? ORDER BY RANDOM() LIMIT 10";
-        final String not_direct_query = "SELECT DISTINCT movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id AND stars.id != ? ORDER BY RANDOM() LIMIT 10";
+        final String not_direct_query = "SELECT DISTINCT m.director FROM movies AS m WHERE m.director NOT IN (select movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id=movies.id AND stars_in_movies.star_id=stars.id AND stars.id=?) ORDER BY RANDOM() LIMIT 10";
 
         if (state == 0) {
             // The number of directors who worked with an actor maybe be less than 4. So there may be less than 4 WRONG choices.
@@ -177,6 +177,8 @@ public class QuestionBuilder {
             populateCorrectAnswer(true, db.executeQuery(did_direct_query, Integer.toString(star_id)));
         }
     }
+
+SELECT DISTINCT m.director FROM movies AS m WHERE m.director NOT IN (select movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id=movies.id AND stars_in_movies.star_id=stars.id AND stars.id=412029) ORDER BY RANDOM() LIMIT 10;
 
     // 6. Which star appears in both movies X and Y?
     private void buildWhichStarInBothMovies() {
