@@ -241,14 +241,11 @@ public class QuestionBuilder {
         final int year = director_cursor.getInt(1);
         final int star_id = director_cursor.getInt(2);
         final String star = director_cursor.getString(3);
-        //FIXME must me a WHERE NOT IN clause
-        final String notDirect_query = "SELECT DISTINCT movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id AND stars.id != "+star_id+" AND movies.year != "+year+" AND movies.director != "+director+" ORDER BY RANDOM() LIMIT 5";
-        
-        //FIXME returns same answer twice
+        final String notDirectInYear_query = "SELECT DISTINCT m.director FROM movies AS m WHERE m.director NOT IN (SELECT movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id AND year="+year+" AND stars.id = "+star_id+") ORDER BY RANDOM() LIMIT 5"
         
         question = "Who directed " + cleanAnswer(star) + " in " + year + "?";
         correct = cleanAnswer(director);
-        populateWrongAnswers(true, db.executeQuery(notDirect_query));
+        populateWrongAnswers(true, db.executeQuery(notDirectInYear_query));
     }
 
     private void populateCorrectAnswer(boolean isString, Cursor cursor) {
