@@ -113,8 +113,7 @@ public class QuestionBuilder {
     private void buildStarInOrNotOneMovie() {
         final String stars_movies_join = "movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id";
         final String star_in_query = "SELECT DISTINCT stars.name FROM " + stars_movies_join + " AND movies.id = ? ORDER BY RANDOM() LIMIT 10";
-        //FIXME must me a WHERE NOT IN clause
-        final String star_out_query = "SELECT DISTINCT stars.name FROM " + stars_movies_join + " AND movies.id != ? ORDER BY RANDOM() LIMIT 10";
+        final String star_out_query = "SELECT DISTINCT s.name FROM stars AS s WHERE s.name NOT IN (SELECT DISTINCT stars.name FROM " + stars_movies_join + " AND movies.id = ?) ORDER BY RANDOM() LIMIT 10";
         final String movie_query = "SELECT title, id FROM movies ORDER BY RANDOM() LIMIT 1";
         final int state = rand.nextInt(2); // 0: is not in movie, 1: is in movie
 
@@ -188,8 +187,6 @@ public class QuestionBuilder {
             populateCorrectAnswer(true, db.executeQuery(did_direct_query, Integer.toString(star_id)));
         }
     }
-
-//SELECT DISTINCT m.director FROM movies AS m WHERE m.director NOT IN (select movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id=movies.id AND stars_in_movies.star_id=stars.id AND stars.id=412029) ORDER BY RANDOM() LIMIT 10;
 
     // 6. Which star appears in both movies X and Y?
     private void buildWhichStarInBothMovies() {
