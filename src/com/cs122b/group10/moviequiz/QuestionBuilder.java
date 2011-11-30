@@ -130,6 +130,11 @@ public class QuestionBuilder {
         final String movie = movie_cursor.getString(0);
         final int movie_id = movie_cursor.getInt(1);
 
+        //FIXME Doesnt return stars that are in the movie...
+        //Which star was not in "Requiem For a Dream"?
+        // "Tommy Lee Jones", "", "", ""
+        
+        
         if (state == 0) {
             // Stars may not appear in 4 or more movies. So there may be less than 4 WRONG choices.
             question="Which star was not in "+movie+"?";
@@ -165,8 +170,7 @@ public class QuestionBuilder {
 
     // 5. Who directed/did not direct the star X?
     private void buildWhoDirectedOrNotStar() {
-        //final int state = rand.nextInt(2); // 0: did direct, 1: did not direct
-        final int state = 0;
+        final int state = rand.nextInt(2); // 0: did direct, 1: did not direct
         final String star_query = "SELECT DISTINCT stars.name, stars.id FROM stars ORDER BY RANDOM() LIMIT 1";
         final Cursor star_cursor = db.executeQuery(star_query);
         star_cursor.moveToFirst();
@@ -182,7 +186,6 @@ public class QuestionBuilder {
             question = "Who has not directed "+cleanString(star)+"?";
             populateWrongAnswers(true, db.executeQuery(did_direct_query, Integer.toString(star_id)));
             populateCorrectAnswer(true, db.executeQuery(not_direct_query, Integer.toString(star_id)));
-
         } else {
             question = "Who has directed "+cleanString(star)+"?";
             populateWrongAnswers(true, db.executeQuery(not_direct_query, Integer.toString(star_id)));
