@@ -151,7 +151,7 @@ public class QuestionBuilder {
         correct = cleanAnswer(movie);
         question = "In which movie did "+cleanAnswer(star1)+" and "+cleanAnswer(star2)+" appear together?";
 
-        final String wrong_query = "SELECT DISTINCT m.title FROM movies AS m WHERE m.title NOT IN (SELECT movies.title FROM movies, stars AS stars1, stars AS stars2, stars_in_movies AS stars_in_movies1, stars_in_movies AS stars_in_movies2 WHERE stars_in_movies1.movie_id = movies.id AND stars_in_movies2.movie_id = movies.id AND stars_in_movies1.star_id = stars1.id AND stars_in_movies2.star_id = stars2.id AND stars1.id != stars2.id AND stars1.id = "+stars1_id+" AND stars2.id = "+stars2_id+") ORDER BY RANDOM() LIMIT 5";
+        final String wrong_query = "SELECT DISTINCT m.title FROM movies AS m WHERE m.title NOT IN (SELECT movies.title FROM movies, stars AS stars1, stars AS stars2, stars_in_movies AS stars_in_movies1, stars_in_movies AS stars_in_movies2 WHERE stars_in_movies1.movie_id = movies.id AND stars_in_movies2.movie_id = movies.id AND stars_in_movies1.star_id = stars1.id AND stars_in_movies2.star_id = stars2.id AND stars1.id != stars2.id AND stars1.id = "+star1_id+" AND stars2.id = "+star2_id+") ORDER BY RANDOM() LIMIT 5";
         populateWrongAnswers(true, db.executeQuery(wrong_query, Integer.toString(movie_id), Integer.toString(star1_id), Integer.toString(star2_id)));
     }
 
@@ -237,7 +237,7 @@ public class QuestionBuilder {
         final int year = director_cursor.getInt(1);
         final int star_id = director_cursor.getInt(2);
         final String star = director_cursor.getString(3);
-        final String notDirectInYear_query = "SELECT DISTINCT m.director FROM movies AS m WHERE m.director NOT IN (SELECT movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id AND year="+year+" AND stars.id = "+star_id+") ORDER BY RANDOM() LIMIT 5"
+        final String notDirectInYear_query = "SELECT DISTINCT m.director FROM movies AS m WHERE m.director NOT IN (SELECT movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id AND year="+year+" AND stars.id = "+star_id+") ORDER BY RANDOM() LIMIT 5";
         
         question = "Who directed " + cleanAnswer(star) + " in " + year + "?";
         correct = cleanAnswer(director);
