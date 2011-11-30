@@ -151,8 +151,7 @@ public class QuestionBuilder {
         correct = cleanAnswer(movie);
         question = "In which movie did "+cleanAnswer(star1)+" and "+cleanAnswer(star2)+" appear together?";
 
-        //FIXME must me a WHERE NOT IN clause
-        final String wrong_query = "SELECT DISTINCT movies.title FROM movies, stars_in_movies AS stars1, stars_in_movies AS stars2  WHERE stars1.movie_id = movies.id AND stars2.movie_id = movies.id AND movies.id != ? AND stars1.star_id != ? AND stars2.star_id != ? ORDER BY RANDOM() LIMIT 5";
+        final String wrong_query = "SELECT DISTINCT m.title FROM movies AS m WHERE m.title NOT IN (SELECT movies.title FROM movies, stars AS stars1, stars AS stars2, stars_in_movies AS stars_in_movies1, stars_in_movies AS stars_in_movies2 WHERE stars_in_movies1.movie_id = movies.id AND stars_in_movies2.movie_id = movies.id AND stars_in_movies1.star_id = stars1.id AND stars_in_movies2.star_id = stars2.id AND stars1.id != stars2.id AND stars1.id = "+stars1_id+" AND stars2.id = "+stars2_id+") ORDER BY RANDOM() LIMIT 5";
         populateWrongAnswers(true, db.executeQuery(wrong_query, Integer.toString(movie_id), Integer.toString(star1_id), Integer.toString(star2_id)));
     }
 
