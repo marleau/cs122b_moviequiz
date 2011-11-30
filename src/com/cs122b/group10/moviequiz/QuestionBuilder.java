@@ -16,37 +16,45 @@ import android.database.Cursor;
 
 public class QuestionBuilder {
 
-    private static final int NUMBER_OF_TYPES = 8;//Types of questions
+    private static final int NUMBER_OF_TYPES = 8; //Types of questions
     private DBAdapter db;
-    private String[] answers;
+    private ArrayList<String> wrong;
     private String correct;
     private String question;
     private Random rand;
+    private ArrayList<String> answers;
+    private int correctIndex;
 
     public QuestionBuilder(DBAdapter db) {
         this.db = db;
         rand = new Random();
-        answers = new String[4];
+        wrong = new ArrayList<String>();
     }
 
     public void nextQuestion() {
-        for (int i = 0; i < 4; i++) { answers[i] = ""; }
+        answers = new ArrayList<String>();
+        wrong = new ArrayList<String>();
         correct = "";
         question = "";
         int type = rand.nextInt(NUMBER_OF_TYPES)+1;
         buildQuestion(type);
+        randomizeAnswers();
     }
 
     public String getQuestion() {
         return question;
     }
 
+    public ArrayList<String> getAnswers() {
+        return answers;
+    }
+
     public String getCorrectAnswer() {
         return correct;
     }
 
-    public String[] getAnswers() {
-        return answers;
+    public int getCorrectIndex() {
+        return correctIndex;
     }
 
     private void buildQuestion(int i) {
@@ -89,7 +97,7 @@ public class QuestionBuilder {
 
         String director = cursor.getString(1);
         String movie = cursor.getString(0);
-        correct = cleanAnswer(director);
+        correct = cleanString(director);
         question = "Who directed the movie " + movie + "?";
 
         populateWrongAnswers(true, db.executeQuery("SELECT DISTINCT director FROM movies WHERE director != "+director+" ORDER BY RANDOM() LIMIT 5"));
@@ -148,16 +156,17 @@ public class QuestionBuilder {
         final String star2 = two_stars_cursor.getString(5);
         System.out.println("movie id: "+movie_id+"\t"+"star id:" + star1_id + ", " + star2_id);
 
-        correct = cleanAnswer(movie);
-        question = "In which movie did "+cleanAnswer(star1)+" and "+cleanAnswer(star2)+" appear together?";
+        correct = cleanString(movie);
+        question = "In which movie did "+cleanString(star1)+" and "+cleanString(star2)+" appear together?";
 
-        final String wrong_query = "SELECT DISTINCT m.title FROM movies AS m WHERE m.title NOT IN (SELECT movies.title FROM movies, stars AS stars1, stars AS stars2, stars_in_movies AS stars_in_movies1, stars_in_movies AS stars_in_movies2 WHERE stars_in_movies1.movie_id = movies.id AND stars_in_movies2.movie_id = movies.id AND stars_in_movies1.star_id = stars1.id AND stars_in_movies2.star_id = stars2.id AND stars1.id != stars2.id AND stars1.id = "+stars1_id+" AND stars2.id = "+stars2_id+") ORDER BY RANDOM() LIMIT 5";
-        populateWrongAnswers(true, db.executeQuery(wrong_query, Integer.toString(movie_id), Integer.toString(star1_id), Integer.toString(star2_id)));
+        final String wrong_query = "SELECT DISTINCT m.title FROM movies AS m WHERE m.title NOT IN (SELECT movies.title FROM movies, stars AS stars1, stars AS stars2, stars_in_movies AS stars_in_movies1, stars_in_movies AS stars_in_movies2 WHERE stars_in_movies1.movie_id = movies.id AND stars_in_movies2.movie_id = movies.id AND stars_in_movies1.star_id = stars1.id AND stars_in_movies2.star_id = stars2.id AND stars1.id != stars2.id AND stars1.id = "+star1_id+" AND stars2.id = "+star2_id+") ORDER BY RANDOM() LIMIT 5";
+        populateWrongAnswers(true, db.executeQuery(wrong_query));
     }
 
     // 5. Who directed/did not direct the star X?
     private void buildWhoDirectedOrNotStar() {
-        final int state = rand.nextInt(2); // 0: did direct, 1: did not direct
+        //final int state = rand.nextInt(2); // 0: did direct, 1: did not direct
+        final int state = 0;
         final String star_query = "SELECT DISTINCT stars.name, stars.id FROM stars ORDER BY RANDOM() LIMIT 1";
         final Cursor star_cursor = db.executeQuery(star_query);
         star_cursor.moveToFirst();
@@ -166,22 +175,16 @@ public class QuestionBuilder {
         final String did_direct_query = "SELECT DISTINCT movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id AND stars.id = ? ORDER BY RANDOM() LIMIT 10";
         final String not_direct_query = "SELECT DISTINCT m.director FROM movies AS m WHERE m.director NOT IN (select movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id=movies.id AND stars_in_movies.star_id=stars.id AND stars.id=?) ORDER BY RANDOM() LIMIT 10";
 
-        //FIXME sometimes returns only one answer or incorrecct answers
-        //e.g. "Who has not directed Meryl Streep?"
-        // "Ben Younger", "", "", ""
-        
-        //FIXME doesnt return answers sometimes
-        //"Who has not directed Hugh Grant?"
-        //"Chris Weitz", "Steven Soderbergh", "Gus Van Sant", ""
-        // Chris and Steven have directed Hugh but blank space should be "Richard Curtis"
-        
+        System.out.println(star + "(" + star_id +")");
+
         if (state == 0) {
             // The number of directors who worked with an actor maybe be less than 4. So there may be less than 4 WRONG choices.
-            question = "Who has not directed "+cleanAnswer(star)+"?";
+            question = "Who has not directed "+cleanString(star)+"?";
             populateWrongAnswers(true, db.executeQuery(did_direct_query, Integer.toString(star_id)));
             populateCorrectAnswer(true, db.executeQuery(not_direct_query, Integer.toString(star_id)));
+
         } else {
-            question = "Who has directed "+cleanAnswer(star)+"?";
+            question = "Who has directed "+cleanString(star)+"?";
             populateWrongAnswers(true, db.executeQuery(not_direct_query, Integer.toString(star_id)));
             populateCorrectAnswer(true, db.executeQuery(did_direct_query, Integer.toString(star_id)));
         }
@@ -203,7 +206,7 @@ public class QuestionBuilder {
         final int movie2_id = star_cursor.getInt(4);
         final String movie2 = star_cursor.getString(5);
 
-        correct = cleanAnswer(star);
+        correct = cleanString(star);
         question = "Which star appears in both " + movie1 + " and " + movie2 + "?";
         populateWrongAnswers(true, db.executeQuery(not_both_query, Integer.toString(movie1_id), Integer.toString(movie2_id)));
     }
@@ -220,11 +223,11 @@ public class QuestionBuilder {
         final Cursor correct_cursor = db.executeQuery(notInSame_query, Integer.toString(star_id));
         correct_cursor.moveToFirst();
         final String correct_star = correct_cursor.getString(0);
-        
+
         System.out.println("star:" +star_id);
 
-        question = "Which star did not appear in the same movie with " + cleanAnswer(star) + "?";
-        correct = cleanAnswer(correct_star);
+        question = "Which star did not appear in the same movie with " + cleanString(star) + "?";
+        correct = cleanString(correct_star);
         populateWrongAnswers(true, db.executeQuery(starsWithStar_query, Integer.toString(star_id)));
     }
 
@@ -237,34 +240,62 @@ public class QuestionBuilder {
         final int year = director_cursor.getInt(1);
         final int star_id = director_cursor.getInt(2);
         final String star = director_cursor.getString(3);
-        final String notDirectInYear_query = "SELECT DISTINCT m.director FROM movies AS m WHERE m.director NOT IN (SELECT movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id AND year="+year+" AND stars.id = "+star_id+") ORDER BY RANDOM() LIMIT 5"
-        
-        question = "Who directed " + cleanAnswer(star) + " in " + year + "?";
-        correct = cleanAnswer(director);
+        final String notDirectInYear_query = "SELECT DISTINCT m.director FROM movies AS m WHERE m.director NOT IN (SELECT movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id AND year="+year+" AND stars.id = "+star_id+")";
+
+        question = "Who directed " + cleanString(star) + " in " + year + "?";
+        correct = cleanString(director);
         populateWrongAnswers(true, db.executeQuery(notDirectInYear_query));
     }
 
     private void populateCorrectAnswer(boolean isString, Cursor cursor) {
         cursor.moveToNext();
-        correct = isString ? cleanAnswer(cursor.getString(0)) : cursor.getString(0);
+        correct = isString ? cleanString(cursor.getString(0)) : cursor.getString(0);
     }
 
     // check potential answer against correct answer and exsiting answers
     // make sure that index 0 has the answer
     private void populateWrongAnswers(boolean isString, Cursor cursor) {
-        int count = 0;
-
-        while (count < 4 && cursor.moveToNext()) {
-            answers[count++] = isString ? cleanAnswer(cursor.getString(0)) : cursor.getString(0);
+        while (wrong.size() < 3 && cursor.moveToNext()) {
+            wrong.add(isString ? cleanString(cursor.getString(0)) : cursor.getString(0));
         }
     }
 
+    private void randomizeAnswers() {
+        System.out.println(question);
+        System.out.println("correct: "+correct);
+        for (String ans : wrong) { System.out.println("wrong: "+ans); }
+        System.out.println("correct @ "+correctIndex);
+
+        // choose a random int to put the correct answer
+        correctIndex = rand.nextInt(wrong.size()+1);
+        int maxAns = wrong.size()+1;
+
+        // combine correct and wrong answers and prevent empty choices when displayed
+        int index = 0;
+        while (index < maxAns) {
+            if (index != correctIndex) {
+                answers.add(index, wrong.remove(wrong.size()-1));
+            } else {
+                answers.add(index, correct);
+            }
+            index++;
+        }
+
+        // if there are less than 4 answers, add empty strings to empty answers
+        while (answers.size() < 4) {
+            answers.add(answers.size(), "");
+        }
+
+        System.out.println("Displayed answers:");
+        for (String ans : answers) { System.out.println("\t"+ans); }
+    }
+
     // remove surrounding quotes
-    private String cleanAnswer(String str) {
+    private String cleanString(String str) {
         return str.substring(1, str.length()-1);
     }
 
     public void close(){
         db.close();
     }
-}
+    }

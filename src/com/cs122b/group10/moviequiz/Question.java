@@ -1,12 +1,16 @@
 package com.cs122b.group10.moviequiz;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.*;
+import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.*;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -129,41 +133,38 @@ public class Question extends Activity {
 
 	private void generateQuestion() {
 		// create question
-		Random rand = new Random();
-
-		// generate correct answer and random wrong answers
-
 		qb.nextQuestion();
+
+		//Random rand = new Random();
 
 		currentQuestion = "Question #" + String.valueOf(numAnsCorr + numAnsWron + 1) + "\n" + qb.getQuestion();
 
-		correctAns = rand.nextInt(4) + 1;// should be random 1-4
-
 		// save correct answer and random wrong answers
-		String correctString = qb.getCorrectAnswer();
-		String[] answers = qb.getAnswers();
-		// for (String ans : answers) {
-		// System.out.println(ans);// DEBUG
-		// }
-		ans1Str = answers[0];
-		ans2Str = answers[1];
-		ans3Str = answers[2];
-		ans4Str = answers[3];
+		//String correctString = qb.getCorrectAnswer();
+		ArrayList<String> answers = qb.getAnswers();
 
-		switch (correctAns) {
-		case 1:
-			ans1Str = correctString;
-			break;
-		case 2:
-			ans2Str = correctString;
-			break;
-		case 3:
-			ans3Str = correctString;
-			break;
-		case 4:
-			ans4Str = correctString;
-			break;
-		}
+		//correctAns = rand.nextInt(4) + 1;// should be random 1-4
+        correctAns = qb.getCorrectIndex()+1;
+		
+		ans1Str = answers.get(0);
+		ans2Str = answers.get(1);
+		ans3Str = answers.get(2);
+		ans4Str = answers.get(3);
+
+		//switch (correctAns) {
+		//case 1:
+		//    ans1Str = correctString;
+		//    break;
+		//case 2:
+		//    ans2Str = correctString;
+		//    break;
+		//case 3:
+		//    ans3Str = correctString;
+		//    break;
+		//case 4:
+		//    ans4Str = correctString;
+		//    break;
+		//}
 
 		displayQuestion();
 	}
