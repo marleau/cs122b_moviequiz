@@ -122,6 +122,11 @@ public class QuestionBuilder {
         final String movie = movie_cursor.getString(0);
         final int movie_id = movie_cursor.getInt(1);
 
+        //FIXME Doesnt return stars that are in the movie...
+        //Which star was not in "Requiem For a Dream"?
+        // "Tommy Lee Jones", "", "", ""
+        
+        
         if (state == 0) {
             // Stars may not appear in 4 or more movies. So there may be less than 4 WRONG choices.
             question="Which star was not in "+movie+"?";
@@ -148,6 +153,8 @@ public class QuestionBuilder {
         final String star2 = two_stars_cursor.getString(5);
         System.out.println("movie id: "+movie_id+"\t"+"star id:" + star1_id + ", " + star2_id);
 
+        //FIXME "Bind or column index out of range"
+        
         correct = cleanAnswer(movie);
         question = "In which movie did "+cleanAnswer(star1)+" and "+cleanAnswer(star2)+" appear together?";
 
