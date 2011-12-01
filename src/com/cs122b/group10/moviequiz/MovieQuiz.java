@@ -40,14 +40,14 @@ public class MovieQuiz extends Activity {
         
         //Setting up inital DB
         db = new DBAdapter(this);
+		db.close();
         //Recreate DB, slow; uncomment to use
 //        db.onCreate(db.getWritableDatabase());
     }
 
 	@Override
 	protected void onDestroy() {
-		// TODO Close DB
-		db.close();
+		//  Close DB
 		super.onDestroy();
 	}
     

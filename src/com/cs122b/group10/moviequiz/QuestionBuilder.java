@@ -100,7 +100,7 @@ public class QuestionBuilder {
         correct = cleanString(director);
         question = "Who directed the movie " + movie + "?";
 
-        populateWrongAnswers(true, db.executeQuery("SELECT DISTINCT director FROM movies WHERE director != "+director+" ORDER BY RANDOM() LIMIT 5"));
+        populateWrongAnswers(true, db.executeQuery("SELECT DISTINCT director FROM movies WHERE director != '"+director+"' ORDER BY RANDOM() LIMIT 5"));
     }
 
     // 2. When was the movie X released?
@@ -129,15 +129,11 @@ public class QuestionBuilder {
         movie_cursor.moveToFirst();
         final String movie = movie_cursor.getString(0);
         final int movie_id = movie_cursor.getInt(1);
-
-        //FIXME Doesnt return stars that are in the movie...
-        //Which star was not in "Requiem For a Dream"?
-        // "Tommy Lee Jones", "", "", ""
         
         
         if (state == 0) {
             // Stars may not appear in 4 or more movies. So there may be less than 4 WRONG choices.
-            question="Which star was not in "+movie+"?";
+            question="Which star was NOT in "+movie+"?";
             populateWrongAnswers(true, db.executeQuery(star_in_query, Integer.toString(movie_id)));
             populateCorrectAnswer(true, db.executeQuery(star_out_query, Integer.toString(movie_id)));
         } else {
@@ -183,7 +179,7 @@ public class QuestionBuilder {
 
         if (state == 0) {
             // The number of directors who worked with an actor maybe be less than 4. So there may be less than 4 WRONG choices.
-            question = "Who has not directed "+cleanString(star)+"?";
+            question = "Who has NOT directed "+cleanString(star)+"?";
             populateWrongAnswers(true, db.executeQuery(did_direct_query, Integer.toString(star_id)));
             populateCorrectAnswer(true, db.executeQuery(not_direct_query, Integer.toString(star_id)));
         } else {
@@ -229,7 +225,7 @@ public class QuestionBuilder {
 
         System.out.println("star:" +star_id);
 
-        question = "Which star did not appear in the same movie with " + cleanString(star) + "?";
+        question = "Which star did NOT appear in the same movie with " + cleanString(star) + "?";
         correct = cleanString(correct_star);
         populateWrongAnswers(true, db.executeQuery(starsWithStar_query, Integer.toString(star_id)));
     }
@@ -243,7 +239,7 @@ public class QuestionBuilder {
         final int year = director_cursor.getInt(1);
         final int star_id = director_cursor.getInt(2);
         final String star = director_cursor.getString(3);
-        final String notDirectInYear_query = "SELECT DISTINCT m.director FROM movies AS m WHERE m.director NOT IN (SELECT movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id AND year="+year+" AND stars.id = "+star_id+")";
+        final String notDirectInYear_query = "SELECT DISTINCT m.director FROM movies AS m WHERE m.director NOT IN (SELECT movies.director FROM movies, stars, stars_in_movies WHERE stars_in_movies.movie_id = movies.id AND stars_in_movies.star_id = stars.id AND year="+year+" AND stars.id = "+star_id+") ORDER BY RANDOM() LIMIT 5";
 
         question = "Who directed " + cleanString(star) + " in " + year + "?";
         correct = cleanString(director);
@@ -270,8 +266,8 @@ public class QuestionBuilder {
         System.out.println("correct @ "+correctIndex);
 
         // choose a random int to put the correct answer
-        correctIndex = rand.nextInt(wrong.size()+1);
         int maxAns = wrong.size()+1;
+        correctIndex = rand.nextInt(maxAns);
 
         // combine correct and wrong answers and prevent empty choices when displayed
         int index = 0;
