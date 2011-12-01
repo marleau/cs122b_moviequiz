@@ -44,10 +44,13 @@ public class Statistics extends Activity {
 		// build reset stats dialog
 		Button resetStats = (Button) findViewById(R.id.resetStatsButton);
 		builder = new AlertDialog.Builder(this);
-		builder.setMessage("Are you sure you want to reset statistics?").setCancelable(false).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+		builder.setMessage("Are you sure you want to reset database?").setCancelable(false).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
-				// TODO RESET STATS
-				sqlDB.delete("statistics",null,null);
+				//  RESET STATS
+//				sqlDB.delete("statistics",null,null);
+				//RELOAD DB
+				DBAdapter db = new DBAdapter(Statistics.this);
+				db.onCreate(db.getWritableDatabase());
 				// RESET display
 				loadStats();
 			}
